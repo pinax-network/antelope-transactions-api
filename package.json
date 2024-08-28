@@ -1,0 +1,59 @@
+{
+  "name": "antelope-transactions-api",
+  "description": "Transactions information from the Antelope blockchains",
+  "version": "0.1.0",
+  "homepage": "https://github.com/pinax-network/antelope-transactions-api",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Etienne Donneger",
+      "email": "etienne@pinax.network",
+      "url": "https://github.com/0237h"
+    },
+    {
+      "name": "Denis Carriere",
+      "email": "denis@pinax.network",
+      "url": "https://github.com/DenisCarriere/"
+    }
+  ],
+  "dependencies": {
+    "@clickhouse/client-web": "latest",
+    "@hono/graphql-server": "^0.5.0",
+    "@kubb/cli": "^2.23.3",
+    "@kubb/core": "^2.23.3",
+    "@kubb/plugin-oas": "^2.23.3",
+    "@kubb/swagger-zod": "^2.23.3",
+    "commander": "latest",
+    "dotenv": "latest",
+    "hono": "latest",
+    "prom-client": "latest",
+    "tslog": "latest",
+    "zod": "latest"
+  },
+  "private": true,
+  "scripts": {
+    "build": "export APP_VERSION=$(git rev-parse --short HEAD) && bun build --compile index.ts --outfile antelope-token-api",
+    "clean": "bun i --force",
+    "dev": "export APP_VERSION=$(git rev-parse --short HEAD) && bun --watch index.ts",
+    "lint": "export APP_VERSION=$(git rev-parse --short HEAD) && bun run tsc --noEmit --skipLibCheck --pretty",
+    "start": "export APP_VERSION=$(git rev-parse --short HEAD) && bun index.ts",
+    "test": "bun test --coverage",
+    "types": "bun run tsp compile ./src/typespec --output-dir static && bun run openapi-to-graphql ./static/@typespec/openapi3/openapi.json --save static/@openapi-to-graphql/graphql/schema.graphql --simpleNames --singularNames --no-viewer -H 'X-Api-Key:changeme' && bun run kubb",
+    "types:check": "bun run tsp compile ./src/typespec --no-emit --pretty --warn-as-error",
+    "types:format": "bun run tsp format src/typespec/**/*.tsp",
+    "types:watch": "bun run tsp compile ./src/typespec --watch --pretty --warn-as-error"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/openapi": "latest",
+    "@typespec/openapi3": "latest",
+    "@typespec/protobuf": "latest",
+    "bun-types": "latest",
+    "openapi-to-graphql-cli": "^3.0.7",
+    "typescript": "latest"
+  },
+  "prettier": {
+    "tabWidth": 4
+  }
+}
