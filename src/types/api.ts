@@ -18,7 +18,7 @@ export type ValidUserParams<E extends UsageEndpoints> = NonNullable<EndpointPara
     z.infer<EndpointParameters<E>["query"]>
     :
     z.infer<EndpointParameters<E>["query"] & ValidPathParams<E>>>;
-export type AdditionalQueryParams = { offset?: number; min_block?: number; max_block?: number; };
+export type AdditionalQueryParams = { offset?: number; };
 // Allow any valid parameters from the endpoint to be used as SQL query parameters
 export type ValidQueryParams = ValidUserParams<UsageEndpoints> & AdditionalQueryParams;
 

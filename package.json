@@ -32,7 +32,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "export APP_VERSION=$(git rev-parse --short HEAD) && bun build --compile index.ts --outfile antelope-token-api",
+    "build": "export APP_VERSION=$(git rev-parse --short HEAD) && bun build --compile index.ts --outfile $npm_package_name",
     "clean": "bun i --force",
     "dev": "export APP_VERSION=$(git rev-parse --short HEAD) && bun --watch index.ts",
     "lint": "export APP_VERSION=$(git rev-parse --short HEAD) && bun run tsc --noEmit --skipLibCheck --pretty",

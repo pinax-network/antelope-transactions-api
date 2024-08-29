@@ -1,6 +1,6 @@
 # Antelope Transactions API
 
-[![.github/workflows/bun-test.yml](https://github.com/pinax-network/antelope-token-api/actions/workflows/bun-test.yml/badge.svg)](https://github.com/pinax-network/antelope-token-api/actions/workflows/bun-test.yml)
+[![.github/workflows/bun-test.yml](https://github.com/pinax-network/antelope-transactions-api/actions/workflows/bun-test.yml/badge.svg)](https://github.com/pinax-network/antelope-transactions-api/actions/workflows/bun-test.yml)
 
 > Transactions information from the Antelope blockchains, powered by [Substreams](https://substreams.streamingfast.io/)
 
@@ -14,15 +14,18 @@
 | Method | Path | Query parameters<br>(* = **Required**) | Description |
 | :---: | --- | --- | --- |
 | GET <br>`text/html` | `/` | - | [Swagger](https://swagger.io/) API playground |
-| GET <br>`application/json` | `/balance` | **`account*`**<br>`contract`<br>`symcode`<br>`limit`<br>`page` | Balances of an account |
-| GET <br>`application/json` | `/balance/historical` | **`account*`**<br>`block_num`<br>`contract`<br>`symcode`<br>`limit`<br>`page` | Historical token balances |
-| GET <br>`application/json` | `/head` | `limit`<br>`page` | Head block information |
-| GET <br>`application/json` | `/holders` | **`contract*`**<br>**`symcode*`**<br>`limit`<br>`page` | List of holders of a token |
-| GET <br>`application/json` | `/supply` | `block_num`<br>`issuer`<br>**`contract*`**<br>**`symcode*`**<br>`limit`<br>`page` | Total supply for a token |
-| GET <br>`application/json` | `/tokens` | `limit`<br>`page` | List of available tokens |
-| GET <br>`application/json` | `/transfers` | `block_range`<br>**`contract*`**<br>**`symcode*`**<br>`limit`<br>`page` | All transfers related to a token |
-| GET <br>`application/json` | `/transfers/account` | **`account*`**<br>`block_range`<br>`from`<br>`to`<br>`contract`<br>`symcode`<br>`limit`<br>`page` | All transfers related to an account |
-| GET <br>`application/json` | `/transfers/id` | **`trx_id*`**<br>`limit`<br>`page` | Specific transfer related to a token |
+| GET<br>`application/json` | `/actions/name/{name}` | **`name*`** | Actions by name |
+| GET<br>`application/json` | `/actions/account/{account}` | **`account*`** | Actions by account |
+| GET<br>`application/json` | `/actions/date/{date}` | **`date*`** | Actions by date |
+| GET<br>`application/json` | `/blocks/date/{date}` | **`date*`** | Blocks by date |
+| GET<br>`application/json` | `/blocks/hash/{hash}` | **`hash*`** | Blocks by hash |
+| GET<br>`application/json` | `/blocks/number/{number}` | **`number*`** | Blocks by number |
+| GET<br>`application/json` | `/dbops/contract/{contract}` | **`contract*`** | DBOps by contract |
+| GET<br>`application/json` | `/dbops/scope/{scope}` | **`scope*`** | DBOps by scope |
+| GET<br>`application/json` | `/dbops/pk/{pk}` | **`pk*`** | DBOps by primary key |
+| GET<br>`application/json` | `/dbops/date/{date}` | **`date*`** | DBOps by date |
+| GET<br>`application/json` | `/transactions/hash/{hash}` | **`hash*`** | Transactions by hash |
+| GET<br>`application/json` | `/transactions/date/{date}` | **`date*`** | Transactions by date |
 
 ### Docs
 
@@ -53,18 +56,16 @@ Use the `Variables` tab at the bottom to add your API key:
 
 ### Additional notes
 
-- For the `block_range` parameter in `transfers`, you can pass a single integer value (low bound) or an array of two values (inclusive range).
-- Use the `from` and `to` field for transfers of an account to further filter the results (i.e. incoming or outgoing transactions from/to another account).
 - Don't forget to request the `meta` fields in the response to get access to pagination and statistics !
 
 ## Requirements
 
-- [ClickHouse](clickhouse.com/), databases should follow a `{chain}_tokens_{version}` naming scheme. Database tables can be setup using the [`schema.sql`](./schema.sql) definitions created by the [`create_schema.sh`](./create_schema.sh) script.
-- A [Substream sink](https://substreams.streamingfast.io/reference-and-specs/glossary#sink) for loading data into ClickHouse. We recommend [Substreams Sink ClickHouse](https://github.com/pinax-network/substreams-sink-clickhouse/) or [Substreams Sink SQL](https://github.com/pinax-network/substreams-sink-sql). You should use the generated [`protobuf` files](static/@typespec/protobuf) to build your substream. This Token API makes use of the [`substreams-antelope-tokens`](https://github.com/pinax-network/substreams-antelope-tokens/) substream.
+- [ClickHouse](clickhouse.com/), databases should follow a `{chain}_transactions_{version}` naming scheme. Database tables can be setup using the [`schema.sql`](./schema.sql) definitions created by the [`create_schema.sh`](./create_schema.sh) script.
+- A [Substream sink](https://substreams.streamingfast.io/reference-and-specs/glossary#sink) for loading data into ClickHouse. We recommend [Substreams Sink ClickHouse](https://github.com/pinax-network/substreams-sink-clickhouse/) or [Substreams Sink SQL](https://github.com/pinax-network/substreams-sink-sql). You should use the generated [`protobuf` files](static/@typespec/protobuf) to build your substream. This Transactions API makes use of the [`substreams-raw-blocks`](https://github.com/pinax-network/substreams-raw-blocks/) Antelope substream.
 
 ### API stack architecture
 
-![Token API architecture diagram](token_api_architecture_diagram.png)
+![API architecture diagram](api_architecture_diagram.png)
 
 ### Setting up the database backend (ClickHouse)
 
@@ -78,10 +79,10 @@ Example on how to set up the ClickHouse backend for sinking [EOS](https://pinax.
 clickhouse server
 ```
 
-2. Create the token database
+2. Create the transactions database
 
 ```console
-echo "CREATE DATABASE eos_tokens_v1" | clickhouse client -h <host> --port 9000 -d <database> -u <user> --password <password>
+echo "CREATE DATABASE eos_transactions_v1" | clickhouse client -h <host> --port 9000 -d <database> -u <user> --password <password>
 ```
 
 3. Run the [`create_schema.sh`](./create_schema.sh) script
@@ -99,8 +100,8 @@ cat /tmp/schema.sql | clickhouse client -h <host> --port 9000 -d <database> -u <
 5. Run the [sink](https://github.com/pinax-network/substreams-sink-sql)
 
 ```console
-substreams-sink-sql run clickhouse://<username>:<password>@<host>:9000/eos_tokens_v1 \
-https://github.com/pinax-network/substreams-antelope-tokens/releases/download/v0.4.0/antelope-tokens-v0.4.0.spkg `#Substreams package` \
+substreams-sink-sql run clickhouse://<username>:<password>@<host>:9000/eos_transactions_v1 \
+https://github.com/pinax-network/substreams-raw-blocks/releases/download/antelope-v0.1.0/raw-blocks-antelope-v0.1.0.spkg `#Substreams package` \
 -e eos.substreams.pinax.network:443 `#Substreams endpoint` \
 1: `#Block range <start>:<end>` \
 --final-blocks-only --undo-buffer-size 1 --on-module-hash-mistmatch=warn --batch-block-flush-interval 100 --development-mode `#Additional flags`
@@ -110,17 +111,17 @@ https://github.com/pinax-network/substreams-antelope-tokens/releases/download/v0
 
 ```console
 # Will be available on locahost:8080 by default
-antelope-token-api --host <host> --database eos_tokens_v1 --username <username> --password <password> --verbose
+antelope-transactions-api --host <host> --database eos_transactions_v1 --username <username> --password <password> --verbose
 ```
 
 #### With a cluster
 
 If you run ClickHouse in a [cluster](https://clickhouse.com/docs/en/architecture/cluster-deployment), change step 2 & 3:
 
-2. Create the token database
+2. Create the transactions database
 
 ```console
-echo "CREATE DATABASE eos_tokens_v1 ON CLUSTER <cluster>" | clickhouse client -h <host> --port 9000 -d <database> -u <user> --password <password>
+echo "CREATE DATABASE eos_transactions_v1 ON CLUSTER <cluster>" | clickhouse client -h <host> --port 9000 -d <database> -u <user> --password <password>
 ```
 
 3. Run the [`create_schema.sh`](./create_schema.sh) script
@@ -129,19 +130,20 @@ echo "CREATE DATABASE eos_tokens_v1 ON CLUSTER <cluster>" | clickhouse client -h
 ./create_schema.sh -o /tmp/schema.sql -c <cluster>
 ```
 
+4. 5. 6. Follow the same steps as without a cluster.
 
-## [`Bun` Binary Releases](https://github.com/pinax-network/antelope-token-api/releases)
+## [`Bun` Binary Releases](https://github.com/pinax-network/antelope-transactions-api/releases)
 
 > [!WARNING]
 > Linux x86 only
 
 ```console
-$ wget https://github.com/pinax-network/antelope-token-api/releases/download/v4.0.0/antelope-token-api
-$ chmod +x ./antelope-token-api
-$ ./antelope-token-api --help                                                                                                       
-Usage: antelope-token-api [options]
+$ wget https://github.com/pinax-network/antelope-transactions-api/releases/download/v0.1.0/antelope-transactions-api
+$ chmod +x ./antelope-transactions-api
+$ ./antelope-transactions-api --help                                                                          
+Usage: antelope-transactions-api [options]
 
-Token balances, supply and transfers from the Antelope blockchains
+Transactions information from the Antelope blockchains
 
 Options:
   -V, --version            output the version number
@@ -180,22 +182,22 @@ VERBOSE=true
 
 **For latest tagged release**
 ```bash
-docker pull ghcr.io/pinax-network/antelope-token-api:latest
+docker pull ghcr.io/pinax-network/antelope-transactions-api:latest
 ```
 
 **For head of `main` branch**
 ```bash
-docker pull ghcr.io/pinax-network/antelope-token-api:develop
+docker pull ghcr.io/pinax-network/antelope-transactions-api:develop
 ```
 
 - Build from source
 ```bash
-docker build -t antelope-token-api .
+docker build -t antelope-transactions-api .
 ```
 
 - Run with `.env` file
 ```bash
-docker run -it --rm --env-file .env ghcr.io/pinax-network/antelope-token-api
+docker run -it --rm --env-file .env ghcr.io/pinax-network/antelope-transactions-api
 ```
 
 ## Contributing

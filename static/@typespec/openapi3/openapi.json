@@ -14,6 +14,18 @@
       "name": "Usage"
     },
     {
+      "name": "Blocks"
+    },
+    {
+      "name": "Transactions"
+    },
+    {
+      "name": "Actions"
+    },
+    {
+      "name": "DBOps"
+    },
+    {
       "name": "Docs"
     },
     {
@@ -21,14 +33,265 @@
     }
   ],
   "paths": {
-    "/blocks/{date}": {
+    "/actions/account/{account}": {
       "get": {
         "tags": [
-          "Usage"
+          "Usage",
+          "Actions"
+        ],
+        "operationId": "Usage_actionsAccount",
+        "summary": "Actions",
+        "description": "Actions by account.",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of actions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Actions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/actions/date/{date}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Actions"
+        ],
+        "operationId": "Usage_actionsDate",
+        "summary": "Actions",
+        "description": "Actions by date.",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of actions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Actions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/actions/name/{name}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Actions"
+        ],
+        "operationId": "Usage_actionsName",
+        "summary": "Actions",
+        "description": "Actions by name.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of actions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Actions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/blocks/date/{date}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Blocks"
         ],
         "operationId": "Usage_blocksDate",
-        "summary": "Blocks",
-        "description": "Block by date.",
+        "summary": "Blocks by date",
+        "description": "Blocks by date.",
         "parameters": [
           {
             "name": "date",
@@ -104,14 +367,15 @@
         ]
       }
     },
-    "/blocks/{hash}": {
+    "/blocks/hash/{hash}": {
       "get": {
         "tags": [
-          "Usage"
+          "Usage",
+          "Blocks"
         ],
         "operationId": "Usage_blocksHash",
-        "summary": "Blocks",
-        "description": "Block by hash.",
+        "summary": "Blocks by hash",
+        "description": "Blocks by hash.",
         "parameters": [
           {
             "name": "hash",
@@ -186,14 +450,15 @@
         ]
       }
     },
-    "/blocks/{number}": {
+    "/blocks/number/{number}": {
       "get": {
         "tags": [
-          "Usage"
+          "Usage",
+          "Blocks"
         ],
         "operationId": "Usage_blocksNumber",
-        "summary": "Blocks",
-        "description": "Block by number.",
+        "summary": "Blocks by block number",
+        "description": "Blocks by block number.",
         "parameters": [
           {
             "name": "number",
@@ -241,6 +506,256 @@
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Models.Blocks"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/dbops/date/{date}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "DBOps"
+        ],
+        "operationId": "Usage_dbopsDate",
+        "summary": "DBOps",
+        "description": "DBOp by date.",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of dbops.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.DBOps"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/dbops/pk/{pk}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "DBOps"
+        ],
+        "operationId": "Usage_dbopsPk",
+        "summary": "DBOps",
+        "description": "DBOp by primary key.",
+        "parameters": [
+          {
+            "name": "pk",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of dbops.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.DBOps"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/dbops/scope/{scope}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "DBOps"
+        ],
+        "operationId": "Usage_dbopsScope",
+        "summary": "DBOps",
+        "description": "DBOps by contract.DBOp by scope.",
+        "parameters": [
+          {
+            "name": "scope",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of dbops.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.DBOps"
                       }
                     },
                     "meta": {
@@ -369,6 +884,173 @@
         }
       }
     },
+    "/transactions/date/{date}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Transactions"
+        ],
+        "operationId": "Usage_transactionsDate",
+        "summary": "Transactions",
+        "description": "Transactions by date.",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of transactions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Transactions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/transactions/hash/{hash}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Transactions"
+        ],
+        "operationId": "Usage_transactionsHash",
+        "summary": "Transactions by hash",
+        "description": "Transactions by hash.",
+        "parameters": [
+          {
+            "name": "hash",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of transactions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Transactions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -445,13 +1127,154 @@
           }
         }
       },
-      "Models.Blocks": {
+      "Models.Actions": {
         "type": "object",
         "required": [
           "block_time",
           "block_number",
           "block_hash",
           "block_date",
+          "tx_hash",
+          "tx_index",
+          "tx_status",
+          "tx_status_code",
+          "tx_success",
+          "abi_sequence",
+          "code_sequence",
+          "digest",
+          "global_sequence",
+          "receipt_receiver",
+          "recv_sequence",
+          "account",
+          "name",
+          "json_data",
+          "raw_data",
+          "index",
+          "receiver",
+          "context_free",
+          "elapsed",
+          "console",
+          "raw_return_value",
+          "json_return_value",
+          "creator_action_ordinal",
+          "closest_unnotified_ancestor_action_ordinal",
+          "execution_index",
+          "action_mroot"
+        ],
+        "properties": {
+          "block_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "block_number": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "block_hash": {
+            "type": "string"
+          },
+          "block_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "tx_hash": {
+            "type": "string"
+          },
+          "tx_index": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "tx_status": {
+            "type": "string"
+          },
+          "tx_status_code": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "tx_success": {
+            "type": "boolean"
+          },
+          "abi_sequence": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "code_sequence": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "digest": {
+            "type": "string"
+          },
+          "global_sequence": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "receipt_receiver": {
+            "type": "string"
+          },
+          "recv_sequence": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "account": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "json_data": {
+            "type": "string"
+          },
+          "raw_data": {
+            "type": "string"
+          },
+          "index": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "receiver": {
+            "type": "string"
+          },
+          "context_free": {
+            "type": "boolean"
+          },
+          "elapsed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "console": {
+            "type": "string"
+          },
+          "raw_return_value": {
+            "type": "string"
+          },
+          "json_return_value": {
+            "type": "string"
+          },
+          "creator_action_ordinal": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "closest_unnotified_ancestor_action_ordinal": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "execution_index": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "action_mroot": {
+            "type": "string"
+          }
+        }
+      },
+      "Models.Blocks": {
+        "type": "object",
+        "required": [
+          "time",
+          "number",
+          "hash",
+          "date",
           "parent_hash",
           "producer",
           "confirmed",
@@ -471,18 +1294,18 @@
           "total_db_ops"
         ],
         "properties": {
-          "block_time": {
+          "time": {
             "type": "string",
             "format": "date-time"
           },
-          "block_number": {
+          "number": {
             "type": "integer",
             "format": "uint64"
           },
-          "block_hash": {
+          "hash": {
             "type": "string"
           },
-          "block_date": {
+          "date": {
             "type": "string",
             "format": "date"
           },
@@ -548,6 +1371,189 @@
           "total_db_ops": {
             "type": "integer",
             "format": "uint64"
+          }
+        }
+      },
+      "Models.DBOps": {
+        "type": "object",
+        "required": [
+          "block_time",
+          "block_number",
+          "block_hash",
+          "block_date",
+          "tx_hash",
+          "tx_index",
+          "tx_status",
+          "tx_status_code",
+          "tx_success",
+          "index",
+          "operation",
+          "operation_code",
+          "action_index",
+          "code",
+          "scope",
+          "table_name",
+          "primary_key",
+          "old_payer",
+          "new_payer",
+          "old_data",
+          "new_data",
+          "old_data_json",
+          "new_data_json"
+        ],
+        "properties": {
+          "block_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "block_number": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "block_hash": {
+            "type": "string"
+          },
+          "block_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "tx_hash": {
+            "type": "string"
+          },
+          "tx_index": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "tx_status": {
+            "type": "string"
+          },
+          "tx_status_code": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "tx_success": {
+            "type": "boolean"
+          },
+          "index": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "operation_code": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "action_index": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "table_name": {
+            "type": "string"
+          },
+          "primary_key": {
+            "type": "string"
+          },
+          "old_payer": {
+            "type": "string"
+          },
+          "new_payer": {
+            "type": "string"
+          },
+          "old_data": {
+            "type": "string"
+          },
+          "new_data": {
+            "type": "string"
+          },
+          "old_data_json": {
+            "type": "string"
+          },
+          "new_data_json": {
+            "type": "string"
+          }
+        }
+      },
+      "Models.Transactions": {
+        "type": "object",
+        "required": [
+          "block_time",
+          "block_number",
+          "block_hash",
+          "block_date",
+          "hash",
+          "index",
+          "elapsed",
+          "net_usage",
+          "scheduled",
+          "cpu_usage_micro_seconds",
+          "net_usage_words",
+          "status",
+          "status_code",
+          "success",
+          "transaction_mroot"
+        ],
+        "properties": {
+          "block_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "block_number": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "block_hash": {
+            "type": "string"
+          },
+          "block_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "index": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "elapsed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "net_usage": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "scheduled": {
+            "type": "boolean"
+          },
+          "cpu_usage_micro_seconds": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "net_usage_words": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "status_code": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "transaction_mroot": {
+            "type": "string"
           }
         }
       },

@@ -18,7 +18,12 @@ namespace Models {
     }
 
     model Blocks {
-        ...Clock,
+        //...Clock, # Can't use it yet, need to update the Raw Blocks substream
+        // Clock
+        time: utcDateTime,
+        number: uint64,
+        hash: string, // 'EVM Hash'
+        date: plainDate,
         // Header
         parent_hash: string, // 'Hash'
         producer: string, // 'Address'
@@ -59,7 +64,6 @@ namespace Models {
         // Block roots
         transaction_mroot: string, // 'Hash'
     }
-
 
     model Actions {
         ...Clock,
