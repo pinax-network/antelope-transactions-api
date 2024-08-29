@@ -56,10 +56,10 @@ CREATE TABLE IF NOT EXISTS cursors $ON_CLUSTER_DIRECTIVE
 CREATE TABLE IF NOT EXISTS blocks $ON_CLUSTER_DIRECTIVE
 (
     -- clock --
-    block_time                                    DateTime64(3, 'UTC'),
-    block_number                                  UInt64,
-    block_date                                    Date,
-    block_hash                                    String COMMENT 'Hash',
+    time                                    DateTime64(3, 'UTC'),
+    number                                  UInt64,
+    date                                    Date,
+    hash                                    String COMMENT 'Hash',
 
     -- header --
     parent_hash                             String COMMENT 'Hash',
@@ -88,8 +88,8 @@ CREATE TABLE IF NOT EXISTS blocks $ON_CLUSTER_DIRECTIVE
     total_db_ops                            UInt64,
 )
     ENGINE = $ENGINE_DEFAULT
-        PRIMARY KEY (block_date, block_number)
-        ORDER BY (block_date, block_number, block_hash)
+        PRIMARY KEY (date, number)
+        ORDER BY (date, number, hash)
         COMMENT 'Antelope block header';
 
 CREATE TABLE IF NOT EXISTS transactions $ON_CLUSTER_DIRECTIVE

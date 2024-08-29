@@ -5,8 +5,20 @@ export const apiErrorSchema = z.object({ "status": z.union([z.literal(500), z.li
 export type ApiErrorSchema = z.infer<typeof apiErrorSchema>;
 
 
-export const modelsBlocksSchema = z.object({ "block_time": z.string().datetime(), "block_number": z.coerce.number(), "block_hash": z.coerce.string(), "block_date": z.string().date(), "parent_hash": z.coerce.string(), "producer": z.coerce.string(), "confirmed": z.coerce.number(), "schedule_version": z.coerce.number(), "version": z.coerce.number(), "producer_signature": z.coerce.string(), "dpos_proposed_irreversible_blocknum": z.coerce.number(), "dpos_irreversible_blocknum": z.coerce.number(), "transaction_mroot": z.coerce.string(), "action_mroot": z.coerce.string(), "blockroot_merkle_node_count": z.coerce.number(), "size": z.coerce.number(), "total_transactions": z.coerce.number(), "successful_transactions": z.coerce.number(), "failed_transactions": z.coerce.number(), "total_actions": z.coerce.number(), "total_db_ops": z.coerce.number() });
+export const modelsActionsSchema = z.object({ "block_time": z.string().datetime(), "block_number": z.coerce.number(), "block_hash": z.coerce.string(), "block_date": z.string().date(), "tx_hash": z.coerce.string(), "tx_index": z.coerce.number(), "tx_status": z.coerce.string(), "tx_status_code": z.coerce.number(), "tx_success": z.boolean(), "abi_sequence": z.coerce.number(), "code_sequence": z.coerce.number(), "digest": z.coerce.string(), "global_sequence": z.coerce.number(), "receipt_receiver": z.coerce.string(), "recv_sequence": z.coerce.number(), "account": z.coerce.string(), "name": z.coerce.string(), "json_data": z.coerce.string(), "raw_data": z.coerce.string(), "index": z.coerce.number(), "receiver": z.coerce.string(), "context_free": z.boolean(), "elapsed": z.coerce.number(), "console": z.coerce.string(), "raw_return_value": z.coerce.string(), "json_return_value": z.coerce.string(), "creator_action_ordinal": z.coerce.number(), "closest_unnotified_ancestor_action_ordinal": z.coerce.number(), "execution_index": z.coerce.number(), "action_mroot": z.coerce.string() });
+export type ModelsActionsSchema = z.infer<typeof modelsActionsSchema>;
+
+
+export const modelsBlocksSchema = z.object({ "time": z.string().datetime(), "number": z.coerce.number(), "hash": z.coerce.string(), "date": z.string().date(), "parent_hash": z.coerce.string(), "producer": z.coerce.string(), "confirmed": z.coerce.number(), "schedule_version": z.coerce.number(), "version": z.coerce.number(), "producer_signature": z.coerce.string(), "dpos_proposed_irreversible_blocknum": z.coerce.number(), "dpos_irreversible_blocknum": z.coerce.number(), "transaction_mroot": z.coerce.string(), "action_mroot": z.coerce.string(), "blockroot_merkle_node_count": z.coerce.number(), "size": z.coerce.number(), "total_transactions": z.coerce.number(), "successful_transactions": z.coerce.number(), "failed_transactions": z.coerce.number(), "total_actions": z.coerce.number(), "total_db_ops": z.coerce.number() });
 export type ModelsBlocksSchema = z.infer<typeof modelsBlocksSchema>;
+
+
+export const modelsDbOpsSchema = z.object({ "block_time": z.string().datetime(), "block_number": z.coerce.number(), "block_hash": z.coerce.string(), "block_date": z.string().date(), "tx_hash": z.coerce.string(), "tx_index": z.coerce.number(), "tx_status": z.coerce.string(), "tx_status_code": z.coerce.number(), "tx_success": z.boolean(), "index": z.coerce.number(), "operation": z.coerce.string(), "operation_code": z.coerce.number(), "action_index": z.coerce.number(), "code": z.coerce.string(), "scope": z.coerce.string(), "table_name": z.coerce.string(), "primary_key": z.coerce.string(), "old_payer": z.coerce.string(), "new_payer": z.coerce.string(), "old_data": z.coerce.string(), "new_data": z.coerce.string(), "old_data_json": z.coerce.string(), "new_data_json": z.coerce.string() });
+export type ModelsDbOpsSchema = z.infer<typeof modelsDbOpsSchema>;
+
+
+export const modelsTransactionsSchema = z.object({ "block_time": z.string().datetime(), "block_number": z.coerce.number(), "block_hash": z.coerce.string(), "block_date": z.string().date(), "hash": z.coerce.string(), "index": z.coerce.number(), "elapsed": z.coerce.number(), "net_usage": z.coerce.number(), "scheduled": z.boolean(), "cpu_usage_micro_seconds": z.coerce.number(), "net_usage_words": z.coerce.number(), "status": z.coerce.string(), "status_code": z.coerce.number(), "success": z.boolean(), "transaction_mroot": z.coerce.string() });
+export type ModelsTransactionsSchema = z.infer<typeof modelsTransactionsSchema>;
 
 
 export const paginationSchema = z.object({ "next_page": z.coerce.number(), "previous_page": z.coerce.number(), "total_pages": z.coerce.number(), "total_results": z.coerce.number() });
@@ -23,6 +35,72 @@ export type ResponseMetadataSchema = z.infer<typeof responseMetadataSchema>;
 
 export const versionSchema = z.object({ "version": z.coerce.string().regex(new RegExp("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$")), "commit": z.coerce.string().regex(new RegExp("^[0-9a-f]{7}$")) });
 export type VersionSchema = z.infer<typeof versionSchema>;
+
+
+export const usageActionsAccountPathParamsSchema = z.object({ "account": z.coerce.string() });
+export type UsageActionsAccountPathParamsSchema = z.infer<typeof usageActionsAccountPathParamsSchema>;
+
+ export const usageActionsAccountQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageActionsAccountQueryParamsSchema = z.infer<typeof usageActionsAccountQueryParamsSchema>;
+/**
+ * @description Array of actions.
+ */
+export const usageActionsAccount200Schema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageActionsAccount200Schema = z.infer<typeof usageActionsAccount200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageActionsAccountErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageActionsAccountErrorSchema = z.infer<typeof usageActionsAccountErrorSchema>;
+/**
+ * @description Array of actions.
+ */
+export const usageActionsAccountQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageActionsAccountQueryResponseSchema = z.infer<typeof usageActionsAccountQueryResponseSchema>;
+
+
+export const usageActionsDatePathParamsSchema = z.object({ "date": z.string().date() });
+export type UsageActionsDatePathParamsSchema = z.infer<typeof usageActionsDatePathParamsSchema>;
+
+ export const usageActionsDateQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageActionsDateQueryParamsSchema = z.infer<typeof usageActionsDateQueryParamsSchema>;
+/**
+ * @description Array of actions.
+ */
+export const usageActionsDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageActionsDate200Schema = z.infer<typeof usageActionsDate200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageActionsDateErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageActionsDateErrorSchema = z.infer<typeof usageActionsDateErrorSchema>;
+/**
+ * @description Array of actions.
+ */
+export const usageActionsDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageActionsDateQueryResponseSchema = z.infer<typeof usageActionsDateQueryResponseSchema>;
+
+
+export const usageActionsNamePathParamsSchema = z.object({ "name": z.coerce.string() });
+export type UsageActionsNamePathParamsSchema = z.infer<typeof usageActionsNamePathParamsSchema>;
+
+ export const usageActionsNameQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageActionsNameQueryParamsSchema = z.infer<typeof usageActionsNameQueryParamsSchema>;
+/**
+ * @description Array of actions.
+ */
+export const usageActionsName200Schema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageActionsName200Schema = z.infer<typeof usageActionsName200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageActionsNameErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageActionsNameErrorSchema = z.infer<typeof usageActionsNameErrorSchema>;
+/**
+ * @description Array of actions.
+ */
+export const usageActionsNameQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageActionsNameQueryResponseSchema = z.infer<typeof usageActionsNameQueryResponseSchema>;
 
 
 export const usageBlocksDatePathParamsSchema = z.object({ "date": z.string().date() });
@@ -90,6 +168,72 @@ export type UsageBlocksNumberErrorSchema = z.infer<typeof usageBlocksNumberError
 export const usageBlocksNumberQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "meta": z.lazy(() => responseMetadataSchema) });
 export type UsageBlocksNumberQueryResponseSchema = z.infer<typeof usageBlocksNumberQueryResponseSchema>;
 
+
+export const usageDbopsDatePathParamsSchema = z.object({ "date": z.string().date() });
+export type UsageDbopsDatePathParamsSchema = z.infer<typeof usageDbopsDatePathParamsSchema>;
+
+ export const usageDbopsDateQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageDbopsDateQueryParamsSchema = z.infer<typeof usageDbopsDateQueryParamsSchema>;
+/**
+ * @description Array of dbops.
+ */
+export const usageDbopsDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageDbopsDate200Schema = z.infer<typeof usageDbopsDate200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageDbopsDateErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageDbopsDateErrorSchema = z.infer<typeof usageDbopsDateErrorSchema>;
+/**
+ * @description Array of dbops.
+ */
+export const usageDbopsDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageDbopsDateQueryResponseSchema = z.infer<typeof usageDbopsDateQueryResponseSchema>;
+
+
+export const usageDbopsPkPathParamsSchema = z.object({ "pk": z.coerce.string() });
+export type UsageDbopsPkPathParamsSchema = z.infer<typeof usageDbopsPkPathParamsSchema>;
+
+ export const usageDbopsPkQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageDbopsPkQueryParamsSchema = z.infer<typeof usageDbopsPkQueryParamsSchema>;
+/**
+ * @description Array of dbops.
+ */
+export const usageDbopsPk200Schema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageDbopsPk200Schema = z.infer<typeof usageDbopsPk200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageDbopsPkErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageDbopsPkErrorSchema = z.infer<typeof usageDbopsPkErrorSchema>;
+/**
+ * @description Array of dbops.
+ */
+export const usageDbopsPkQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageDbopsPkQueryResponseSchema = z.infer<typeof usageDbopsPkQueryResponseSchema>;
+
+
+export const usageDbopsScopePathParamsSchema = z.object({ "scope": z.coerce.string() });
+export type UsageDbopsScopePathParamsSchema = z.infer<typeof usageDbopsScopePathParamsSchema>;
+
+ export const usageDbopsScopeQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageDbopsScopeQueryParamsSchema = z.infer<typeof usageDbopsScopeQueryParamsSchema>;
+/**
+ * @description Array of dbops.
+ */
+export const usageDbopsScope200Schema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageDbopsScope200Schema = z.infer<typeof usageDbopsScope200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageDbopsScopeErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageDbopsScopeErrorSchema = z.infer<typeof usageDbopsScopeErrorSchema>;
+/**
+ * @description Array of dbops.
+ */
+export const usageDbopsScopeQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageDbopsScopeQueryResponseSchema = z.infer<typeof usageDbopsScopeQueryResponseSchema>;
+
  /**
  * @description OK or ApiError.
  */
@@ -138,6 +282,50 @@ export type DocsOpenapiErrorSchema = z.infer<typeof docsOpenapiErrorSchema>;
 export const docsOpenapiQueryResponseSchema = z.object({});
 export type DocsOpenapiQueryResponseSchema = z.infer<typeof docsOpenapiQueryResponseSchema>;
 
+
+export const usageTransactionsDatePathParamsSchema = z.object({ "date": z.string().date() });
+export type UsageTransactionsDatePathParamsSchema = z.infer<typeof usageTransactionsDatePathParamsSchema>;
+
+ export const usageTransactionsDateQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageTransactionsDateQueryParamsSchema = z.infer<typeof usageTransactionsDateQueryParamsSchema>;
+/**
+ * @description Array of transactions.
+ */
+export const usageTransactionsDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageTransactionsDate200Schema = z.infer<typeof usageTransactionsDate200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageTransactionsDateErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageTransactionsDateErrorSchema = z.infer<typeof usageTransactionsDateErrorSchema>;
+/**
+ * @description Array of transactions.
+ */
+export const usageTransactionsDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageTransactionsDateQueryResponseSchema = z.infer<typeof usageTransactionsDateQueryResponseSchema>;
+
+
+export const usageTransactionsHashPathParamsSchema = z.object({ "hash": z.coerce.string() });
+export type UsageTransactionsHashPathParamsSchema = z.infer<typeof usageTransactionsHashPathParamsSchema>;
+
+ export const usageTransactionsHashQueryParamsSchema = z.object({ "limit": z.coerce.number().optional(), "page": z.coerce.number().optional() }).optional();
+export type UsageTransactionsHashQueryParamsSchema = z.infer<typeof usageTransactionsHashQueryParamsSchema>;
+/**
+ * @description Array of transactions.
+ */
+export const usageTransactionsHash200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageTransactionsHash200Schema = z.infer<typeof usageTransactionsHash200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageTransactionsHashErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageTransactionsHashErrorSchema = z.infer<typeof usageTransactionsHashErrorSchema>;
+/**
+ * @description Array of transactions.
+ */
+export const usageTransactionsHashQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "meta": z.lazy(() => responseMetadataSchema) });
+export type UsageTransactionsHashQueryResponseSchema = z.infer<typeof usageTransactionsHashQueryResponseSchema>;
+
  /**
  * @description The Api version and commit hash.
  */
@@ -154,7 +342,43 @@ export type DocsVersionErrorSchema = z.infer<typeof docsVersionErrorSchema>;
 export const docsVersionQueryResponseSchema = z.lazy(() => versionSchema);
 export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResponseSchema>;
 
- export const operations = { "Usage_blocksDate": {
+ export const operations = { "Usage_actionsAccount": {
+        request: undefined,
+        parameters: {
+            path: usageActionsAccountPathParamsSchema,
+            query: usageActionsAccountQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageActionsAccountQueryResponseSchema,
+            default: usageActionsAccountQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_actionsDate": {
+        request: undefined,
+        parameters: {
+            path: usageActionsDatePathParamsSchema,
+            query: usageActionsDateQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageActionsDateQueryResponseSchema,
+            default: usageActionsDateQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_actionsName": {
+        request: undefined,
+        parameters: {
+            path: usageActionsNamePathParamsSchema,
+            query: usageActionsNameQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageActionsNameQueryResponseSchema,
+            default: usageActionsNameQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_blocksDate": {
         request: undefined,
         parameters: {
             path: usageBlocksDatePathParamsSchema,
@@ -188,6 +412,42 @@ export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResp
         responses: {
             200: usageBlocksNumberQueryResponseSchema,
             default: usageBlocksNumberQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_dbopsDate": {
+        request: undefined,
+        parameters: {
+            path: usageDbopsDatePathParamsSchema,
+            query: usageDbopsDateQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageDbopsDateQueryResponseSchema,
+            default: usageDbopsDateQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_dbopsPk": {
+        request: undefined,
+        parameters: {
+            path: usageDbopsPkPathParamsSchema,
+            query: usageDbopsPkQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageDbopsPkQueryResponseSchema,
+            default: usageDbopsPkQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_dbopsScope": {
+        request: undefined,
+        parameters: {
+            path: usageDbopsScopePathParamsSchema,
+            query: usageDbopsScopeQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageDbopsScopeQueryResponseSchema,
+            default: usageDbopsScopeQueryResponseSchema
         },
         errors: {}
     }, "Monitoring_health": {
@@ -226,6 +486,30 @@ export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResp
             default: docsOpenapiQueryResponseSchema
         },
         errors: {}
+    }, "Usage_transactionsDate": {
+        request: undefined,
+        parameters: {
+            path: usageTransactionsDatePathParamsSchema,
+            query: usageTransactionsDateQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageTransactionsDateQueryResponseSchema,
+            default: usageTransactionsDateQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_transactionsHash": {
+        request: undefined,
+        parameters: {
+            path: usageTransactionsHashPathParamsSchema,
+            query: usageTransactionsHashQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageTransactionsHashQueryResponseSchema,
+            default: usageTransactionsHashQueryResponseSchema
+        },
+        errors: {}
     }, "Docs_version": {
         request: undefined,
         parameters: {
@@ -239,18 +523,34 @@ export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResp
         },
         errors: {}
     } } as const;
-export const paths = { "/blocks/{date}": {
+export const paths = { "/actions/account/{account}": {
+        get: operations["Usage_actionsAccount"]
+    }, "/actions/date/{date}": {
+        get: operations["Usage_actionsDate"]
+    }, "/actions/name/{name}": {
+        get: operations["Usage_actionsName"]
+    }, "/blocks/date/{date}": {
         get: operations["Usage_blocksDate"]
-    }, "/blocks/{hash}": {
+    }, "/blocks/hash/{hash}": {
         get: operations["Usage_blocksHash"]
-    }, "/blocks/{number}": {
+    }, "/blocks/number/{number}": {
         get: operations["Usage_blocksNumber"]
+    }, "/dbops/date/{date}": {
+        get: operations["Usage_dbopsDate"]
+    }, "/dbops/pk/{pk}": {
+        get: operations["Usage_dbopsPk"]
+    }, "/dbops/scope/{scope}": {
+        get: operations["Usage_dbopsScope"]
     }, "/health": {
         get: operations["Monitoring_health"]
     }, "/metrics": {
         get: operations["Monitoring_metrics"]
     }, "/openapi": {
         get: operations["Docs_openapi"]
+    }, "/transactions/date/{date}": {
+        get: operations["Usage_transactionsDate"]
+    }, "/transactions/hash/{hash}": {
+        get: operations["Usage_transactionsHash"]
     }, "/version": {
         get: operations["Docs_version"]
     } } as const;

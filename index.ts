@@ -13,7 +13,7 @@ import { APIErrorResponse } from "./src/utils.js";
 import { usageOperationsToEndpointsMap, type EndpointReturnTypes, type UsageEndpoints, type ValidPathParams, type ValidUserParams } from "./src/types/api.js";
 import { paths } from './src/types/zod.gen.js';
 
-async function AntelopeTokenAPI() {
+async function AntelopeTransactionsAPI() {
     const app = new Hono();
 
     // Tracking all incoming requests
@@ -95,7 +95,7 @@ async function AntelopeTokenAPI() {
                     ctx,
                     endpoint,
                     {
-                        ...path_params.data as SafeParseSuccess<ValidPathParams<typeof endpoint>>,
+                        ...path_params.data,
                         ...query_params.data
                     } as ValidUserParams<typeof endpoint>
                 );
@@ -172,4 +172,4 @@ async function AntelopeTokenAPI() {
     return app;
 }
 
-export default await AntelopeTokenAPI();
+export default await AntelopeTransactionsAPI();

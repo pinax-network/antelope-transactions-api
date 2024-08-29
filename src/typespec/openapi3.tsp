@@ -71,46 +71,176 @@ alias PaginationQueryParams = {
     @query page?: uint64 = 1;
 };
 
-@tag("Usage")
+@tag("Usage") // Important: all endpoints querying the ClickHouse backend must be under this tagged interface
 interface Usage {
     /**
-        Block by hash.
+        Blocks by hash.
         @returns Array of blocks.
     */
-    @summary("Blocks")
-    @route("/blocks/{hash}")
+    @tag("Blocks")
+    @summary("Blocks by hash")
+    @route("/blocks/hash/{hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     blocksHash(
-        @path hash: Models.Blocks.block_hash,
+        @path hash: Models.Blocks.hash,
         ...PaginationQueryParams,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
 
     /**
-        Block by number.
+        Blocks by block number.
         @returns Array of blocks.
     */
-    @summary("Blocks")
-    @route("/blocks/{number}")
+    @tag("Blocks")
+    @summary("Blocks by block number")
+    @route("/blocks/number/{number}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     blocksNumber(
-        @path number: Models.Blocks.block_number,
+        @path number: Models.Blocks.number,
         ...PaginationQueryParams,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
 
     /**
-        Block by date.
+        Blocks by date.
         @returns Array of blocks.
     */
-    @summary("Blocks")
-    @route("/blocks/{date}")
+    @tag("Blocks")
+    @summary("Blocks by date")
+    @route("/blocks/date/{date}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     blocksDate(
-        @path date: Models.Blocks.block_date,
+        @path date: Models.Blocks.date,
         ...PaginationQueryParams,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
+
+    /**
+        Transactions by hash.
+        @returns Array of transactions.
+    */
+    @tag("Transactions")
+    @summary("Transactions by hash")
+    @route("/transactions/hash/{hash}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    transactionsHash(
+        @path hash: Models.Transactions.block_hash,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.Transactions>>;
+
+    /**
+        Transactions by date.
+        @returns Array of transactions.
+    */
+    @tag("Transactions")
+    @summary("Transactions")
+    @route("/transactions/date/{date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    transactionsDate(
+        @path date: Models.Transactions.block_date,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.Transactions>>;
+
+    /**
+        Actions by name.
+        @returns Array of actions.
+    */
+    @tag("Actions")
+    @summary("Actions")
+    @route("/actions/name/{name}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    actionsName(
+        @path name: Models.Actions.name,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.Actions>>;
+
+    /**
+        Actions by account.
+        @returns Array of actions.
+    */
+    @tag("Actions")
+    @summary("Actions")
+    @route("/actions/account/{account}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    actionsAccount(
+        @path account: Models.Actions.account,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.Actions>>;
+
+    /**
+        Actions by date.
+        @returns Array of actions.
+    */
+    @tag("Actions")
+    @summary("Actions")
+    @route("/actions/date/{date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    actionsDate(
+        @path date: Models.Actions.block_date,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.Actions>>;
+
+    /**
+        DBOps by contract.
+        @returns Array of dbops.
+    */
+    // Missing `contract` info in DBOps ?
+    // @tag("DBOps")
+    // @summary("DBOps")
+    // @route("/dbops/contract/{contract}")
+    // @get
+    // @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    // dbopsContract(
+    //     @path contract: Models.DBOps.contract,
+    //     ...PaginationQueryParams,
+    // ): ApiResponse<UsageResponse<Models.DBOps>>;
+
+    /**
+        DBOp by scope.
+        @returns Array of dbops.
+    */
+    @tag("DBOps")
+    @summary("DBOps")
+    @route("/dbops/scope/{scope}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    dbopsScope(
+        @path scope: Models.DBOps.scope,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.DBOps>>;
+
+    /**
+        DBOp by primary key.
+        @returns Array of dbops.
+    */
+    @tag("DBOps")
+    @summary("DBOps")
+    @route("/dbops/pk/{pk}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    dbopsPk(
+        @path pk: Models.DBOps.primary_key,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.DBOps>>;
+
+    /**
+        DBOp by date.
+        @returns Array of dbops.
+    */
+    @tag("DBOps")
+    @summary("DBOps")
+    @route("/dbops/date/{date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    dbopsDate(
+        @path date: Models.DBOps.block_date,
+        ...PaginationQueryParams,
+    ): ApiResponse<UsageResponse<Models.DBOps>>;
 }
 
 model Version {

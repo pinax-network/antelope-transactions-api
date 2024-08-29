@@ -137,6 +137,6 @@ dist
 cursor.lock
 
 # CLI
-antelope-token-api
+antelope-transactions-api
 
 *.db

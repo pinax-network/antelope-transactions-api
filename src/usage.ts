@@ -25,9 +25,16 @@ export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, use
 
     let filters = "";
     // Don't add `limit` and `block_range` to WHERE clause
-    for (const k of Object.keys(query_params).filter(k => k !== "limit")) {
+    for (let k of Object.keys(query_params).filter(k => k !== "limit")) {
         const clickhouse_type = typeof query_params[k as keyof typeof query_params] === "number" ? "int" : "String";
-        filters += ` (${k} = {${k}: ${clickhouse_type}}) AND`;
+
+        // TODO: Improve/remove filtering by modifying the underlying schemas
+        if (!endpoint.startsWith('/blocks') && ['date', 'hash', 'number'].includes(k) && !(endpoint == '/transactions/hash/{hash}' && k == 'hash'))
+            filters += ` (block_${k} = {${k}: ${clickhouse_type}}) AND`;
+        else if (k === 'pk')
+            filters += ` (primary_key = {${k}: ${clickhouse_type}}) AND`;
+        else
+            filters += ` (${k} = {${k}: ${clickhouse_type}}) AND`;
     }
 
     filters = filters.substring(0, filters.lastIndexOf(' ')); // Remove last item ` AND`
@@ -37,11 +44,16 @@ export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, use
     let query = "";
     let additional_query_params: AdditionalQueryParams = {};
 
-    // Parse block range for endpoints that uses it. Check for single value or two comma-separated values.
-    if (endpoint == "/blocks/{date}" || endpoint == "/blocks/{hash}" || endpoint == "/blocks/{number}") {
-        // NB: Using `account_balances` seems to return the most results
-        //     Have to try with fully synced chain to compare with `create_events` and others
-        query += `SELECT * FROM blocks ${filters}`;
+    if (endpoint == "/blocks/date/{date}" || endpoint == "/blocks/hash/{hash}" || endpoint == "/blocks/number/{number}") {
+        query += `SELECT * FROM blocks ${filters} ORDER BY number`;
+    } else if (endpoint == "/actions/account/{account}" || endpoint == "/actions/name/{name}" || endpoint == "/actions/date/{date}") {
+        query += `SELECT * FROM actions ${filters} ORDER BY block_number`;
+    } else if (endpoint == "/dbops/date/{date}" || endpoint == "/dbops/pk/{pk}" || endpoint == "/dbops/scope/{scope}") {
+        query += `SELECT * FROM db_ops ${filters} ORDER BY block_number`;
+    } else if (endpoint == "/transactions/date/{date}" || endpoint == "/transactions/hash/{hash}") {
+        query += `SELECT * FROM transactions ${filters} ORDER BY block_number`;
+    } else {
+        return APIErrorResponse(ctx, 400, "bad_query_input", `Unknown endpoint: ${endpoint}`);
     }
 
     query += " LIMIT {limit: int}";

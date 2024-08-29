@@ -8,587 +8,167 @@
 -------------------------------------------------
 -- Meta tables to store Substreams information --
 -------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS cursors ON CLUSTER "antelope"
+CREATE TABLE IF NOT EXISTS cursors 
 (
     id        String,
     cursor    String,
     block_num Int64,
     block_id  String
 )
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
+    ENGINE = ReplacingMergeTree()
         PRIMARY KEY (id)
         ORDER BY (id);
 
------------------------------------------------------------
--- Tables to store the raw events without any processing --
------------------------------------------------------------
-
--- The table to store all transfers. This uses the trx_id as first primary key so we can use this table to do
--- transfer lookups based on a transaction id.
-CREATE TABLE IF NOT EXISTS transfer_events ON CLUSTER "antelope"
+CREATE TABLE IF NOT EXISTS blocks 
 (
-    trx_id       String,
-    action_index UInt32,
-    -- contract & scope --
-    contract     String,
-    symcode      String,
-    -- data payload --
-    from         String,
-    to           String,
-    quantity     String,
-    memo         String,
-    -- extras --
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-    -- meta --
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (trx_id, action_index)
-        ORDER BY (trx_id, action_index);
+    -- clock --
+    time                                    DateTime64(3, 'UTC'),
+    number                                  UInt64,
+    date                                    Date,
+    hash                                    String COMMENT 'Hash',
 
--- The table to store all account balance changes from the database operations. This uses the account and block_num as
--- first primary keys so we can use this table to lookup the account balance from a certain block number.
-CREATE TABLE IF NOT EXISTS balance_change_events ON CLUSTER "antelope"
+    -- header --
+    parent_hash                             String COMMENT 'Hash',
+    producer                                String COMMENT 'Address',
+    confirmed                               UInt32,
+    schedule_version                        UInt32,
+
+    -- block --
+    version                                 UInt32,
+    producer_signature                      String COMMENT 'Signature',
+    dpos_proposed_irreversible_blocknum     UInt32,
+    dpos_irreversible_blocknum              UInt32,
+
+    -- block roots --
+    transaction_mroot                       String COMMENT 'Hash',
+    action_mroot                            String COMMENT 'Hash',
+    -- blockroot_merkle_active_nodes           Array(String) COMMENT 'A blockroot Merkle tree uses hashes to verify blockchain data integrity. Leaf nodes hash data blocks, non-leaf nodes hash child nodes. The root hash efficiently verifies all data.',
+    blockroot_merkle_node_count             UInt32,
+
+    -- counters --
+    size                                    UInt64 COMMENT 'Block size estimate in bytes',
+    total_transactions                      UInt64,
+    successful_transactions                 UInt64,
+    failed_transactions                     UInt64,
+    total_actions                           UInt64,
+    total_db_ops                            UInt64,
+)
+    ENGINE = ReplacingMergeTree()
+        PRIMARY KEY (date, number)
+        ORDER BY (date, number, hash)
+        COMMENT 'Antelope block header';
+
+CREATE TABLE IF NOT EXISTS transactions 
 (
-    trx_id        String,
-    action_index  UInt32,
-    -- contract & scope --
-    contract      String,
-    symcode       String,
-    -- data payload --
-    account       String,
-    balance       String,
-    balance_delta Int64,
-    -- extras --
-    precision     UInt32,
-    amount        Int64,
-    value         Float64,
-    -- meta --
-    block_num     UInt64,
-    timestamp     DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (account, block_num, trx_id, action_index)
-        ORDER BY (account, block_num, trx_id, action_index);
+    -- clock --
+    block_time                  DateTime64(3, 'UTC'),
+    block_number                UInt64,
+    block_hash                  String COMMENT 'Hash',
+    block_date                  Date,
 
--- The table to store all token supply changes from the database operations. This uses the account and block_num as
--- first primary keys so we can use this table to lookup token supplies from a certain block number.
-CREATE TABLE IF NOT EXISTS supply_change_events ON CLUSTER "antelope"
+    -- transaction --
+    hash                        String COMMENT 'Hash',
+    `index`                     UInt64,
+    elapsed                     Int64,
+    net_usage                   UInt64,
+    scheduled                   Bool,
+
+    -- header --
+    cpu_usage_micro_seconds     UInt32,
+    net_usage_words             UInt32,
+    status                      LowCardinality(String) COMMENT 'Status',
+    status_code                 UInt8,
+    success                     Bool,
+
+    -- block roots --
+    transaction_mroot           String COMMENT 'Hash',
+)
+    ENGINE = ReplacingMergeTree()
+        PRIMARY KEY (block_date, block_number)
+        ORDER BY (block_date, block_number, block_hash, hash)
+        COMMENT 'Antelope transactions';
+
+CREATE TABLE IF NOT EXISTS actions 
 (
-    trx_id       String,
-    action_index UInt32,
-    -- contract & scope --
-    contract     String,
-    symcode      String,
-    -- data payload --
-    issuer       String,
-    max_supply   String,
-    supply       String,
-    supply_delta Int64,
-    -- extras --
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-    -- meta --
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (contract, block_num, trx_id, action_index)
-        ORDER BY (contract, block_num, trx_id, action_index);
+    -- clock --
+    block_time                  DateTime64(3, 'UTC'),
+    block_number                UInt64,
+    block_hash                  String COMMENT 'Hash',
+    block_date                  Date,
 
--- Table to contain all 'eosio.token:issue' transactions
-CREATE TABLE IF NOT EXISTS issue_events ON CLUSTER "antelope"
+    -- transaction --
+    tx_hash                     String COMMENT 'Hash',
+    tx_index                    UInt64,
+    tx_status                   LowCardinality(String),
+    tx_status_code              UInt8,
+    tx_success                  Bool,
+
+    -- receipt --
+    abi_sequence                UInt64,
+    code_sequence               UInt64,
+    digest                      String,
+    global_sequence             UInt64,
+    receipt_receiver            String COMMENT 'Address',
+    recv_sequence               UInt64,
+
+    -- action --
+    account                     String COMMENT 'Address',
+    name                        String COMMENT 'Address',
+    json_data                   String COMMENT 'JSON',
+    raw_data                    String COMMENT 'Hex',
+
+    -- trace --
+    `index`                                         UInt32 COMMENT 'Action Ordinal',
+    receiver                                        String,
+    context_free                                    Bool,
+    elapsed                                         Int64,
+    console                                         String,
+    raw_return_value                                String,
+    json_return_value                               String,
+    creator_action_ordinal                          UInt32,
+    closest_unnotified_ancestor_action_ordinal      UInt32,
+    execution_index                                 UInt32,
+
+    -- block roots --
+    action_mroot                                    String COMMENT 'Hash',
+)
+    ENGINE = ReplacingMergeTree()
+        PRIMARY KEY (block_date, block_number)
+        ORDER BY (block_date, block_number, block_hash, tx_hash, tx_index, `index`)
+        COMMENT 'Antelope actions';
+
+CREATE TABLE IF NOT EXISTS db_ops 
 (
-    trx_id       String,
-    action_index UInt32,
-    -- contract & scope --
-    contract     String,
-    symcode      String,
-    -- data payload --
-    issuer       String,
-    to           String,
-    quantity     String,
-    memo         String,
-    -- extras --
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-    -- meta --
-    block_num    UInt64,
-    timestamp    DateTime
+    -- clock --
+    block_time                  DateTime64(3, 'UTC'),
+    block_number                UInt64,
+    block_hash                  String COMMENT 'EVM Hash',
+    block_date                  Date,
+
+    -- transaction --
+    tx_hash                     String COMMENT 'Hash',
+    tx_index                    UInt64,
+    tx_status                   LowCardinality(String),
+    tx_status_code              UInt8,
+    tx_success                  Bool,
+
+    -- storage change --
+    `index`                     UInt32,
+    operation                   LowCardinality(String) COMMENT 'Operation',
+    operation_code              UInt8,
+    action_index                UInt32,
+    code                        String,
+    scope                       String,
+    table_name                  String,
+    primary_key                 String,
+    old_payer                   String,
+    new_payer                   String,
+    old_data                    String,
+    new_data                    String,
+    old_data_json               String,
+    new_data_json               String,
 )
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (contract, symcode, to, amount, trx_id, action_index)
-        ORDER BY (contract, symcode, to, amount, trx_id, action_index);
-
--- Table to contain all 'eosio.token:retire' transactions --
-CREATE TABLE IF NOT EXISTS retire_events ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-    -- contract & scope --
-    contract     String,
-    symcode      String,
-    -- data payload --
-    from         String,
-    quantity     String,
-    memo         String,
-    -- extras --
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-    -- meta --
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (contract, symcode, amount, trx_id, action_index)
-        ORDER BY (contract, symcode, amount, trx_id, action_index);
-
--- Table to contain all 'eosio.token:create' transactions
-CREATE TABLE IF NOT EXISTS create_events ON CLUSTER "antelope"
-(
-    trx_id         String,
-    action_index   UInt32,
-    -- contract & scope --
-    contract       String,
-    symcode        String,
-    -- data payload --
-    issuer         String,
-    maximum_supply String,
-    -- extras --
-    precision      UInt32,
-    amount         Int64,
-    value          Float64,
-    -- meta --
-    block_num      UInt64,
-    timestamp      DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (contract, symcode, trx_id, action_index)
-        ORDER BY (contract, symcode, trx_id, action_index);
-
------------------------------------------------
--- Tables to store the extracted information --
------------------------------------------------
-
--- Table to store up to date balances per account and token
-CREATE TABLE IF NOT EXISTS account_balances ON CLUSTER "antelope"
-(
-    trx_id        String,
-    action_index  UInt32,
-
-    contract      String,
-    symcode       String,
-
-    account       String,
-    balance       String,
-    balance_delta Int64,
-
-    precision     UInt32,
-    amount        Int64,
-    value         Float64,
-
-    block_num     UInt64,
-    timestamp     DateTime,
-    ver           UInt64
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}', ver)
-        PRIMARY KEY (account, contract, symcode)
-        ORDER BY (account, contract, symcode);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS account_balances_mv ON CLUSTER "antelope"
-    TO account_balances
-AS
-SELECT *,
-       (block_num + action_index) AS ver
-FROM balance_change_events;
-
--- Table to store historical balances per account and token
-CREATE TABLE IF NOT EXISTS historical_account_balances ON CLUSTER "antelope"
-(
-    trx_id        String,
-    action_index  UInt32,
-
-    contract      String,
-    symcode       String,
-
-    account       String,
-    balance       String,
-    balance_delta Int64,
-
-    precision     UInt32,
-    amount        Int64,
-    value         Float64,
-
-    block_num     UInt64,
-    timestamp     DateTime,
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (block_num, account, contract, symcode)
-        ORDER BY (block_num, account, contract, symcode);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS historical_account_balances_mv ON CLUSTER "antelope"
-    TO historical_account_balances
-AS
-SELECT *
-FROM balance_change_events;
-
--- Table to store up to date positive balances per account and token for token holders
-CREATE TABLE IF NOT EXISTS token_holders ON CLUSTER "antelope"
-(
-    action_index  UInt32,
-
-    contract      String,
-    symcode       String,
-
-    account       String,
-    value         Float64,
-
-    block_num     UInt64,
-    has_null_balance UInt8,
-    ver                  UInt64
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}', ver, has_null_balance)
-        PRIMARY KEY (has_null_balance, contract, symcode, account)
-        ORDER BY (has_null_balance, contract, symcode, account);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS token_holders_mv ON CLUSTER "antelope"
-    TO token_holders
-AS
-SELECT action_index,
-       contract,
-       symcode,
-       account,
-       value,
-       block_num,
-       if(amount > 0, 0, 1) AS has_null_balance,
-       (block_num + action_index) AS ver
-FROM balance_change_events;
-
--- Table to store up to date token supplies
-CREATE TABLE IF NOT EXISTS token_supplies ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    issuer       String,
-    max_supply   String,
-    supply       String,
-    supply_delta Int64,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime,
-    ver          UInt64
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}', ver)
-        PRIMARY KEY (contract, symcode, issuer)
-        ORDER BY (contract, symcode, issuer);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS token_supplies_mv ON CLUSTER "antelope"
-    TO token_supplies
-AS
-SELECT *,
-       (block_num + action_index) AS ver
-FROM supply_change_events;
-
--- Table to store historical token supplies per token
-CREATE TABLE IF NOT EXISTS historical_token_supplies ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    issuer       String,
-    max_supply   String,
-    supply       String,
-    supply_delta Int64,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime,
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (block_num, contract, symcode, issuer)
-        ORDER BY (block_num, contract, symcode, issuer);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS historical_token_supplies_mv ON CLUSTER "antelope"
-    TO historical_token_supplies
-AS
-SELECT *
-FROM supply_change_events;
-
--- Table to store token transfers primarily indexed by the 'contract' field --
-CREATE TABLE IF NOT EXISTS transfers_contract ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    from         String,
-    to           String,
-    quantity     String,
-    memo         String,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (contract, symcode, trx_id, action_index)
-        ORDER BY (contract, symcode, trx_id, action_index);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS transfers_contract_mv ON CLUSTER "antelope"
-    TO transfers_contract
-AS
-SELECT trx_id,
-       action_index,
-       contract,
-       symcode,
-       from,
-       to,
-       quantity,
-       memo,
-       precision,
-       amount,
-       value,
-       block_num,
-       timestamp
-FROM transfer_events;
-
--- Table to store token transfers primarily indexed by the 'from' field --
-CREATE TABLE IF NOT EXISTS transfers_from ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    from         String,
-    to           String,
-    quantity     String,
-    memo         String,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (from, to, contract, symcode, trx_id, action_index)
-        ORDER BY (from, to, contract, symcode, trx_id, action_index);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS transfers_from_mv ON CLUSTER "antelope"
-    TO transfers_from
-AS
-SELECT trx_id,
-       action_index,
-       contract,
-       symcode,
-       from,
-       to,
-       quantity,
-       memo,
-       precision,
-       amount,
-       value,
-       block_num,
-       timestamp
-FROM transfer_events;
-
--- Table to store historical token transfers 'from' address --
-CREATE TABLE IF NOT EXISTS historical_transfers_from ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    from         String,
-    to           String,
-    quantity     String,
-    memo         String,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (block_num, from, to, contract, symcode, trx_id, action_index)
-        ORDER BY (block_num, from, to, contract, symcode, trx_id, action_index);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS historical_transfers_from_mv ON CLUSTER "antelope"
-    TO historical_transfers_from
-AS
-SELECT trx_id,
-       action_index,
-       contract,
-       symcode,
-       from,
-       to,
-       quantity,
-       memo,
-       precision,
-       amount,
-       value,
-       block_num,
-       timestamp
-FROM transfer_events;
-
--- Table to store token transfers primarily indexed by the 'to' field --
-CREATE TABLE IF NOT EXISTS transfers_to ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    from         String,
-    to           String,
-    quantity     String,
-    memo         String,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (to, contract, symcode, trx_id, action_index)
-        ORDER BY (to, contract, symcode, trx_id, action_index);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS transfers_to_mv ON CLUSTER "antelope"
-    TO transfers_to
-AS
-SELECT trx_id,
-       action_index,
-       contract,
-       symcode,
-       from,
-       to,
-       quantity,
-       memo,
-       precision,
-       amount,
-       value,
-       block_num,
-       timestamp
-FROM transfer_events;
-
--- Table to store historical token transfers 'to' address --
-CREATE TABLE IF NOT EXISTS historical_transfers_to ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    from         String,
-    to           String,
-    quantity     String,
-    memo         String,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (block_num, to, contract, symcode, trx_id, action_index)
-        ORDER BY (block_num, to, contract, symcode, trx_id, action_index);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS historical_transfers_to_mv ON CLUSTER "antelope"
-    TO historical_transfers_to
-AS
-SELECT trx_id,
-       action_index,
-       contract,
-       symcode,
-       from,
-       to,
-       quantity,
-       memo,
-       precision,
-       amount,
-       value,
-       block_num,
-       timestamp
-FROM transfer_events;
-
--- Table to store token transfers primarily indexed by the 'block_num' field
-CREATE TABLE IF NOT EXISTS transfers_block_num ON CLUSTER "antelope"
-(
-    trx_id       String,
-    action_index UInt32,
-
-    contract     String,
-    symcode      String,
-
-    from         String,
-    to           String,
-    quantity     String,
-    memo         String,
-
-    precision    UInt32,
-    amount       Int64,
-    value        Float64,
-
-    block_num    UInt64,
-    timestamp    DateTime
-)
-    ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
-        PRIMARY KEY (block_num, contract, symcode, trx_id, action_index)
-        ORDER BY (block_num, contract, symcode, trx_id, action_index);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS transfers_block_num_mv ON CLUSTER "antelope"
-    TO transfers_block_num
-AS
-SELECT trx_id,
-       action_index,
-       contract,
-       symcode,
-       from,
-       to,
-       quantity,
-       memo,
-       precision,
-       amount,
-       value,
-       block_num,
-       timestamp
-FROM transfer_events;
+    ENGINE = ReplacingMergeTree()
+        PRIMARY KEY (block_date, block_number)
+        ORDER BY (block_date, block_number, block_hash, tx_hash, `index`)
+        COMMENT 'Antelope database operations';
