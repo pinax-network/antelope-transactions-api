@@ -35,44 +35,74 @@ alias ErrorStatusCode = 500 | 504 | 400 | 401 | 403 | 404 | 405;
 
 @error
 model ApiError {
-    status: ErrorStatusCode;
-    code: ApiErrorCode;
-    message: string;
+    status: ErrorStatusCode,
+    code: ApiErrorCode,
+    message: string,
 }
 
 model QueryStatistics {
-    elapsed: float;
-    rows_read: safeint;
-    bytes_read: safeint;
-}
-
-model Pagination {
-    next_page: safeint;
-    previous_page: safeint;
-    total_pages: safeint;
-    total_results: safeint;
+    elapsed: float,
+    rows_read: safeint,
+    bytes_read: safeint,
 }
 
 model ResponseMetadata {
-    statistics: QueryStatistics | null;
-    ...Pagination;
+    statistics: QueryStatistics | null,
+    total_results: safeint,
 }
 
 model UsageResponse<T> {
-    data: T[];
-    meta: ResponseMetadata;
+    data: T[],
+    meta: ResponseMetadata,
+}
+
+model SearchTransactions {
+    ...Models.Transactions,
+    actions: Models.Actions[],
+    authorizations: {
+        tx_hash: Models.Authorizations.tx_hash,
+        action_ordinal: Models.Authorizations.action_ordinal,
+        actor: Models.Authorizations.actor,
+        permission: Models.Authorizations.permission,
+    }[],
+    receivers: {
+        tx_hash: Models.Receivers.tx_hash,
+        action_ordinal: Models.Receivers.action_ordinal,
+        receiver: Models.Receivers.receiver,
+    }[],
 }
 
 // Alias will *not* be present in the OpenAPI components.
 // This also helps preventing self-references in generated `components` for codegen to work properly.
 alias ApiResponse<T> = T | ApiError;
-alias PaginationQueryParams = {
-    @query limit?: uint64 = 10;
-    @query page?: uint64 = 1;
+alias Filters = {
+    @query first?: safeint = 10,
+    @query skip?: safeint = 0,
+    @query order_by?: "block_number" = "block_number",
+    @query order_direction?: "asc" | "desc" = "desc",
 };
 
 @tag("Usage") // Important: all endpoints querying the ClickHouse backend must be under this tagged interface
 interface Usage {
+    @tag("Search")
+    @summary("Search transactions")
+    @route("/search/transactions")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    searchTransactions(
+        @query account?: Models.Actions.account,
+        @query action?: Models.Actions.name,
+        @query auth?: Models.Authorizations.actor,
+        @query hash?: Models.Transactions.hash,
+        @query number?: Models.Transactions.block_number,
+        @query receiver?: Models.Receivers.receiver,
+        ...Filters,
+    ): ApiResponse<UsageResponse<SearchTransactions>>;
+
+    // ===========================================================
+    // Blocks
+    // ===========================================================
+
     /**
         Blocks by hash.
         @returns Array of blocks.
@@ -83,8 +113,8 @@ interface Usage {
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     blocksHash(
-        @path hash: Models.Blocks.hash,
-        ...PaginationQueryParams,
+        @path hash: Models.Blocks.block_hash,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
 
     /**
@@ -97,8 +127,8 @@ interface Usage {
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     blocksNumber(
-        @path number: Models.Blocks.number,
-        ...PaginationQueryParams,
+        @path number: Models.Blocks.block_number,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
 
     /**
@@ -111,9 +141,13 @@ interface Usage {
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     blocksDate(
-        @path date: Models.Blocks.date,
-        ...PaginationQueryParams,
+        @path date: Models.Blocks.block_date,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
+
+    // ===========================================================
+    // Transactions
+    // ===========================================================
 
     /**
         Transactions by hash.
@@ -125,8 +159,8 @@ interface Usage {
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     transactionsHash(
-        @path hash: Models.Transactions.block_hash,
-        ...PaginationQueryParams,
+        @path hash: Models.Transactions.hash,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Transactions>>;
 
     /**
@@ -140,8 +174,26 @@ interface Usage {
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     transactionsDate(
         @path date: Models.Transactions.block_date,
-        ...PaginationQueryParams,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Transactions>>;
+
+    // ===========================================================
+    // Actions
+    // ===========================================================
+
+    /**
+        Actions by block number.
+        @returns Array of actions.
+    */
+    @tag("Actions")
+    @summary("Actions")
+    @route("/actions/number/{number}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    actionsNumber(
+        @path number: Models.Actions.block_number,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Actions>>;
 
     /**
         Actions by name.
@@ -154,7 +206,7 @@ interface Usage {
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     actionsName(
         @path name: Models.Actions.name,
-        ...PaginationQueryParams,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Actions>>;
 
     /**
@@ -168,7 +220,7 @@ interface Usage {
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     actionsAccount(
         @path account: Models.Actions.account,
-        ...PaginationQueryParams,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Actions>>;
 
     /**
@@ -182,65 +234,170 @@ interface Usage {
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     actionsDate(
         @path date: Models.Actions.block_date,
-        ...PaginationQueryParams,
+        ...Filters,
     ): ApiResponse<UsageResponse<Models.Actions>>;
 
-    /**
-        DBOps by contract.
-        @returns Array of dbops.
-    */
-    // Missing `contract` info in DBOps ?
-    // @tag("DBOps")
-    // @summary("DBOps")
-    // @route("/dbops/contract/{contract}")
-    // @get
-    // @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    // dbopsContract(
-    //     @path contract: Models.DBOps.contract,
-    //     ...PaginationQueryParams,
-    // ): ApiResponse<UsageResponse<Models.DBOps>>;
+    // ===========================================================
+    // Receivers
+    // ===========================================================
 
     /**
-        DBOp by scope.
-        @returns Array of dbops.
+        Receivers by block number.
+        @returns Array of receivers.
     */
-    @tag("DBOps")
-    @summary("DBOps")
-    @route("/dbops/scope/{scope}")
+    @tag("Receivers")
+    @summary("Receivers by block number")
+    @route("/receivers/number/{number}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    dbopsScope(
-        @path scope: Models.DBOps.scope,
-        ...PaginationQueryParams,
-    ): ApiResponse<UsageResponse<Models.DBOps>>;
+    receiversNumber(
+        @path number: Models.Receivers.block_number,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Receivers>>;
 
     /**
-        DBOp by primary key.
-        @returns Array of dbops.
+        Receivers by date.
+        @returns Array of receivers.
     */
-    @tag("DBOps")
-    @summary("DBOps")
-    @route("/dbops/pk/{pk}")
+    @tag("Receivers")
+    @summary("Receivers by date")
+    @route("/receivers/date/{date}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    dbopsPk(
-        @path pk: Models.DBOps.primary_key,
-        ...PaginationQueryParams,
-    ): ApiResponse<UsageResponse<Models.DBOps>>;
+    receiversDate(
+        @path date: Models.Receivers.block_date,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Receivers>>;
 
     /**
-        DBOp by date.
-        @returns Array of dbops.
+        Receivers by transaction hash.
+        @returns Array of receivers.
     */
-    @tag("DBOps")
-    @summary("DBOps")
-    @route("/dbops/date/{date}")
+    @tag("Receivers")
+    @summary("Receivers by transaction hash")
+    @route("/receivers/transaction/{hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    dbopsDate(
-        @path date: Models.DBOps.block_date,
-        ...PaginationQueryParams,
-    ): ApiResponse<UsageResponse<Models.DBOps>>;
+    receiversTransaction(
+        @path hash: Models.Receivers.tx_hash,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Receivers>>;
+
+    /**
+        Receivers by action ordinal.
+        @returns Array of receivers.
+    */
+    @tag("Receivers")
+    @summary("Receivers by action ordinal")
+    @route("/receivers/action/{ordinal}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    receiversAction(
+        @path ordinal: Models.Receivers.action_ordinal,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Receivers>>;
+
+    /**
+        Receivers by receiver.
+        @returns Array of receivers.
+    */
+    @tag("Receivers")
+    @summary("Receivers by receiver")
+    @route("/receivers/receiver/{receiver}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    receiversReceiver(
+        @path receiver: Models.Receivers.receiver,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Receivers>>;
+
+    // ===========================================================
+    // Authorizations
+    // ===========================================================
+
+    /**
+        Authorizations by block number.
+        @returns Array of authorizations.
+    */
+    @tag("Authorizations")
+    @summary("Authorizations by block number")
+    @route("/authorizations/number/{number}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsNumber(
+        @path number: Models.Authorizations.block_number,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+
+    /**
+        Authorizations by date.
+        @returns Array of authorizations.
+    */
+    @tag("Authorizations")
+    @summary("Authorizations by date")
+    @route("/authorizations/date/{date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsDate(
+        @path date: Models.Authorizations.block_date,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+
+    /**
+        Authorizations by transaction hash.
+        @returns Array of authorizations.
+    */
+    @tag("Authorizations")
+    @summary("Authorizations by transaction hash")
+    @route("/authorizations/transaction/{hash}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsTransaction(
+        @path hash: Models.Authorizations.tx_hash,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+
+    /**
+        Authorizations by action ordinal.
+        @returns Array of authorizations.
+    */
+    @tag("Authorizations")
+    @summary("Authorizations by action ordinal")
+    @route("/authorizations/action/{ordinal}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsAction(
+        @path ordinal: Models.Authorizations.action_ordinal,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+
+    /**
+        Authorizations by actor.
+        @returns Array of authorizations.
+    */
+    @tag("Authorizations")
+    @summary("Authorizations by actor")
+    @route("/authorizations/actor/{actor}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsActor(
+        @path actor: Models.Authorizations.actor,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+
+    /**
+        Authorizations by permission.
+        @returns Array of authorizations.
+    */
+    @tag("Authorizations")
+    @summary("Authorizations by permission")
+    @route("/authorizations/permission/{permission}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsPermission(
+        @path permission: Models.Authorizations.permission,
+        ...Filters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
 }
 
 model Version {

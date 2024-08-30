@@ -2,7 +2,8 @@ import { makeQuery } from "./clickhouse/makeQuery.js";
 import { APIErrorResponse } from "./utils.js";
 
 import type { Context } from "hono";
-import type { AdditionalQueryParams, UsageEndpoints, UsageResponse, ValidUserParams } from "./types/api.js";
+import type { AdditionalQueryParams, EndpointReturnTypes, UsageEndpoints, UsageResponse, ValidUserParams } from "./types/api.js";
+import { ModelsActionsSchema, ModelsAuthorizationsSchema, ModelsReceiversSchema, ModelsTransactionsSchema } from "./types/zod.gen.js";
 
 /**
  * This function creates and send the SQL queries to the ClickHouse database based on the endpoint requested.
@@ -15,21 +16,28 @@ import type { AdditionalQueryParams, UsageEndpoints, UsageResponse, ValidUserPar
 export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, user_params: ValidUserParams<typeof endpoint>) {
     type UsageElementReturnType = UsageResponse<typeof endpoint>[number];
 
-    let { page, ...query_params } = user_params;
+    let { first, skip, order_by, order_direction, ...query_params } = user_params;
 
-    if (!query_params.limit)
-        query_params.limit = 10;
-
-    if (!page)
-        page = 1;
+    if (!first)
+        first = 10;
+    if (!skip)
+        skip = 0;
+    if (!order_by)
+        order_by = 'block_number';
+    if (!order_direction)
+        order_direction = 'desc';
 
     let filters = "";
-    // Don't add `limit` and `block_range` to WHERE clause
-    for (let k of Object.keys(query_params).filter(k => k !== "limit")) {
+    for (let k of Object.keys(query_params)) {
         const clickhouse_type = typeof query_params[k as keyof typeof query_params] === "number" ? "int" : "String";
 
-        // TODO: Improve/remove filtering by modifying the underlying schemas
-        if (!endpoint.startsWith('/blocks') && ['date', 'hash', 'number'].includes(k) && !(endpoint == '/transactions/hash/{hash}' && k == 'hash'))
+        if (k === 'hash' && (endpoint == "/authorizations/transaction/{hash}" || endpoint == "/receivers/transaction/{hash}"))
+            // Rename `hash` parameter to `tx_hash` for transactions endpoint
+            filters += ` (tx_${k} = {${k}: ${clickhouse_type}}) AND`;
+        else if (k === 'ordinal')
+            filters += ` (action_${k} = {${k}: ${clickhouse_type}}) AND`;
+        else if (['date', 'number'].includes(k))
+            // Add `block_` suffix for all endpoints for search by date and number
             filters += ` (block_${k} = {${k}: ${clickhouse_type}}) AND`;
         else if (k === 'pk')
             filters += ` (primary_key = {${k}: ${clickhouse_type}}) AND`;
@@ -42,55 +50,113 @@ export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, use
         filters = `WHERE ${filters}`;
 
     let query = "";
-    let additional_query_params: AdditionalQueryParams = {};
+    let additional_query_params: AdditionalQueryParams = {
+        limit: first,
+        offset: skip,
+        order_by
+    };
 
     if (endpoint == "/blocks/date/{date}" || endpoint == "/blocks/hash/{hash}" || endpoint == "/blocks/number/{number}") {
-        query += `SELECT * FROM blocks ${filters} ORDER BY number`;
+        query += `SELECT * FROM blocks ${filters}`;
     } else if (endpoint == "/actions/account/{account}" || endpoint == "/actions/name/{name}" || endpoint == "/actions/date/{date}") {
-        query += `SELECT * FROM actions ${filters} ORDER BY block_number`;
-    } else if (endpoint == "/dbops/date/{date}" || endpoint == "/dbops/pk/{pk}" || endpoint == "/dbops/scope/{scope}") {
-        query += `SELECT * FROM db_ops ${filters} ORDER BY block_number`;
+        query += `SELECT * FROM actions ${filters}`;
     } else if (endpoint == "/transactions/date/{date}" || endpoint == "/transactions/hash/{hash}") {
-        query += `SELECT * FROM transactions ${filters} ORDER BY block_number`;
+        query += `SELECT * FROM transactions ${filters}`;
+    } else if (endpoint.startsWith("/authorizations")) {
+        query += `SELECT * FROM authorizations ${filters}`;
+    } else if (endpoint.startsWith("/receivers")) {
+        query += `SELECT * FROM receivers ${filters}`;
+    } else if (endpoint == "/search/transactions") {
+        const searchResponse: EndpointReturnTypes<typeof endpoint> = {
+            data: [],
+            meta: {
+                statistics: {
+                    bytes_read: 0,
+                    elapsed: 0,
+                    rows_read: 0,
+                },
+                total_results: 0
+            }
+        };
+
+        const q = query_params as ValidUserParams<typeof endpoint>;
+        if (!q.account && !q.action && !q.auth && !q.hash && !q.number && !q.receiver)
+            return APIErrorResponse(ctx, 400, "bad_query_input", "Too few parameters !");
+
+        filters = '';
+        if (q.hash || q.number)
+            filters += `WHERE 1=1 ${q.hash ? 'AND hash={hash: String} ' : ''} ${q.number ? 'AND block_number={number: int} ' : ''}`;
+
+        // Fetch transactions matching hash/number filters if present, use first, skip and order_* inputs here as well 
+        const transactions = (await makeQuery(
+            `SELECT * FROM transactions ORDER BY {order_by: String} ${order_direction} LIMIT {limit: int} OFFSET {offset:int}`,
+            { limit: first, offset: skip, order_by, order_direction, hash: q.hash ?? '', number: q.number })
+        );
+
+        // For each transactions, we match the tx_hash to get the Actions, Authorizations and Receivers
+        for (const t of (transactions.data as Iterable<ModelsTransactionsSchema>)) {
+            const tx_hash = t.hash;
+
+            // TODO: Add max actions limit ?
+            const actions = (await makeQuery<ModelsActionsSchema>(
+                `SELECT * FROM actions WHERE tx_hash={hash: String} `
+                + `${q.account ? 'AND account={account: String} ' : ''} `
+                + `${q.action ? 'AND name={name: String} ' : ''}`,
+                { account: q.account, hash: tx_hash, name: q.action }
+            ));
+
+            // TODO: Add max authorizations limit ?
+            const authorizations = (await makeQuery<ModelsAuthorizationsSchema>(
+                `SELECT tx_hash, action_ordinal, actor, permission FROM authorizations WHERE tx_hash={hash: String} `
+                + `${q.auth ? 'AND actor={actor: String} ' : ''}`,
+                { actor: q.auth, hash: tx_hash }
+            ));
+
+            // TODO: Add max receivers limit ?
+            const receivers = (await makeQuery<ModelsReceiversSchema>(
+                `SELECT tx_hash, action_ordinal, receiver FROM receivers WHERE tx_hash={hash: String} `
+                + `${q.receiver ? 'AND receiver={receiver: String} ' : ''}`,
+                { hash: tx_hash, receiver: q.receiver }
+            ));
+
+            searchResponse.data.push({
+                ...t,
+                actions: actions.data,
+                authorizations: authorizations.data,
+                receivers: receivers.data,
+            });
+
+            // Update statistics from all query responses (cumulative sum)
+            [actions, authorizations, receivers]
+                // @ts-ignore Suppress `statistics` type having `| null`. ClickHouse always returns statistics.
+                .forEach(e => Object.keys(searchResponse.meta.statistics).map((k) => {
+                    // @ts-ignore
+                    searchResponse.meta.statistics[k] += e.statistics[k];
+                }));
+        }
+
+        searchResponse.meta.total_results = transactions.data.length;
+        return ctx.json(searchResponse);
     } else {
         return APIErrorResponse(ctx, 400, "bad_query_input", `Unknown endpoint: ${endpoint}`);
     }
 
+    query += ` ORDER BY {order_by: String} ${order_direction}`;
     query += " LIMIT {limit: int}";
     query += " OFFSET {offset: int}";
 
     let query_results;
-    additional_query_params.offset = query_params.limit * (page - 1);
     try {
         query_results = await makeQuery<UsageElementReturnType>(query, { ...query_params, ...additional_query_params });
     } catch (err) {
         return APIErrorResponse(ctx, 500, "bad_database_response", err);
     }
 
-    // Always have a least one total page
-    const total_pages = Math.max(Math.ceil((query_results.rows_before_limit_at_least ?? 0) / query_params.limit), 1);
-
-    if (page > total_pages)
-        return APIErrorResponse(ctx, 400, "bad_query_input", `Requested page (${page}) exceeds total pages (${total_pages})`);
-
-    /* Solving the `data` type issue:
-    type A = string[] | number[]; // This is union of array types
-    type B = A[number][]; // This is array of elements of union type
-
-    let t: A;
-    let v: B;
-
-    t = v; // Error
-    */
-
     return ctx.json<UsageResponse<typeof endpoint>, 200>({
-        // @ts-ignore        
+        // @ts-ignore Suppress TS weird type confusion between union of array types and array of union types
         data: query_results.data,
         meta: {
             statistics: query_results.statistics ?? null,
-            next_page: (page * query_params.limit >= (query_results.rows_before_limit_at_least ?? 0)) ? page : page + 1,
-            previous_page: (page <= 1) ? page : page - 1,
-            total_pages,
             total_results: query_results.rows_before_limit_at_least ?? 0
         }
     });

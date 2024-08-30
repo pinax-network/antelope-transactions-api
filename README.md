@@ -14,18 +14,28 @@
 | Method | Path | Query parameters<br>(* = **Required**) | Description |
 | :---: | --- | --- | --- |
 | GET <br>`text/html` | `/` | - | [Swagger](https://swagger.io/) API playground |
-| GET<br>`application/json` | `/actions/name/{name}` | **`name*`** | Actions by name |
 | GET<br>`application/json` | `/actions/account/{account}` | **`account*`** | Actions by account |
 | GET<br>`application/json` | `/actions/date/{date}` | **`date*`** | Actions by date |
+| GET<br>`application/json` | `/actions/name/{name}` | **`name*`** | Actions by name |
+| GET<br>`application/json` | `/actions/number/{number}` | **`number*`** | Actions by number |
+| GET<br>`application/json` | `/authorizations/actor/{actor}` | **`actor*`** | Authorizations by actor |
+| GET<br>`application/json` | `/authorizations/date/{date}` | **`date*`** | Authorizations by date |
+| GET<br>`application/json` | `/authorizations/number/{number}` | **`number*`** | Authorizations by number |
+| GET<br>`application/json` | `/authorizations/permission/{permission}` | **`permission*`** | Authorizations by permission |
+| GET<br>`application/json` | `/authorizations/transaction/{hash}` | **`hash*`** | Authorizations by hash |
 | GET<br>`application/json` | `/blocks/date/{date}` | **`date*`** | Blocks by date |
 | GET<br>`application/json` | `/blocks/hash/{hash}` | **`hash*`** | Blocks by hash |
 | GET<br>`application/json` | `/blocks/number/{number}` | **`number*`** | Blocks by number |
-| GET<br>`application/json` | `/dbops/contract/{contract}` | **`contract*`** | DBOps by contract |
-| GET<br>`application/json` | `/dbops/scope/{scope}` | **`scope*`** | DBOps by scope |
-| GET<br>`application/json` | `/dbops/pk/{pk}` | **`pk*`** | DBOps by primary key |
-| GET<br>`application/json` | `/dbops/date/{date}` | **`date*`** | DBOps by date |
-| GET<br>`application/json` | `/transactions/hash/{hash}` | **`hash*`** | Transactions by hash |
+| GET<br>`application/json` | `/receivers/date/{date}` | **`date*`** | Receivers by date |
+| GET<br>`application/json` | `/receivers/number/{number}` | **`number*`** | Receivers by number |
+| GET<br>`application/json` | `/receivers/receiver/{receiver}` | **`receiver*`** | Receivers by receiver |
+| GET<br>`application/json` | `/receivers/transaction/{hash}` | **`hash*`** | Receivers by hash |
+| GET<br>`application/json` | `/search/transactions` | `account`<br>`action`<br>`auth`<br>`hash`<br>`number`<br>`receiver` | Search transactions, requires at least one parameter |
 | GET<br>`application/json` | `/transactions/date/{date}` | **`date*`** | Transactions by date |
+| GET<br>`application/json` | `/transactions/hash/{hash}` | **`hash*`** | Transactions by hash |
+
+> [!NOTE]
+> All endpoints support `first`, `skip`, `order_by`, `order_direction` as additional query parameters.
 
 ### Docs
 
@@ -61,7 +71,7 @@ Use the `Variables` tab at the bottom to add your API key:
 ## Requirements
 
 - [ClickHouse](clickhouse.com/), databases should follow a `{chain}_transactions_{version}` naming scheme. Database tables can be setup using the [`schema.sql`](./schema.sql) definitions created by the [`create_schema.sh`](./create_schema.sh) script.
-- A [Substream sink](https://substreams.streamingfast.io/reference-and-specs/glossary#sink) for loading data into ClickHouse. We recommend [Substreams Sink ClickHouse](https://github.com/pinax-network/substreams-sink-clickhouse/) or [Substreams Sink SQL](https://github.com/pinax-network/substreams-sink-sql). You should use the generated [`protobuf` files](static/@typespec/protobuf) to build your substream. This Transactions API makes use of the [`substreams-raw-blocks`](https://github.com/pinax-network/substreams-raw-blocks/) Antelope substream.
+- A [Substream sink](https://substreams.streamingfast.io/reference-and-specs/glossary#sink) for loading data into ClickHouse. We recommend [Substreams Sink ClickHouse](https://github.com/pinax-network/substreams-sink-clickhouse/) or [Substreams Sink SQL](https://github.com/pinax-network/substreams-sink-sql). You should use the generated [`protobuf` files](static/@typespec/protobuf) to build your substream. This Transactions API makes use of the [`antelope-transactions-substreams`](https://github.com/pinax-network/antelope-transactions-substreams/).
 
 ### API stack architecture
 
@@ -101,7 +111,7 @@ cat /tmp/schema.sql | clickhouse client -h <host> --port 9000 -d <database> -u <
 
 ```console
 substreams-sink-sql run clickhouse://<username>:<password>@<host>:9000/eos_transactions_v1 \
-https://github.com/pinax-network/substreams-raw-blocks/releases/download/antelope-v0.1.0/raw-blocks-antelope-v0.1.0.spkg `#Substreams package` \
+https://github.com/pinax-network/antelope-transactions-substreams/releases/download/v0.1.1/antelope-transactions-v0.1.1.spkg `#Substreams package` \
 -e eos.substreams.pinax.network:443 `#Substreams endpoint` \
 1: `#Block range <start>:<end>` \
 --final-blocks-only --undo-buffer-size 1 --on-module-hash-mistmatch=warn --batch-block-flush-interval 100 --development-mode `#Additional flags`

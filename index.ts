@@ -1,7 +1,7 @@
 import { Hono, type Context } from "hono";
 import { type RootResolver, graphqlServer } from '@hono/graphql-server';
 import { buildSchema } from 'graphql';
-import { SafeParseSuccess, z } from 'zod';
+import { z } from 'zod';
 
 import client from './src/clickhouse/client.js';
 import openapi from "./static/@typespec/openapi3/openapi.json";
@@ -10,7 +10,7 @@ import { APP_VERSION } from "./src/config.js";
 import { logger } from './src/logger.js';
 import { makeUsageQuery } from "./src/usage.js";
 import { APIErrorResponse } from "./src/utils.js";
-import { usageOperationsToEndpointsMap, type EndpointReturnTypes, type UsageEndpoints, type ValidPathParams, type ValidUserParams } from "./src/types/api.js";
+import { usageOperationsToEndpointsMap, type EndpointReturnTypes, type UsageEndpoints, type ValidUserParams } from "./src/types/api.js";
 import { paths } from './src/types/zod.gen.js';
 
 async function AntelopeTransactionsAPI() {
@@ -89,13 +89,13 @@ async function AntelopeTransactionsAPI() {
             const query_params_schema = paths[endpoint]["get"]["parameters"]["query"] ?? z.unknown();
             const path_params = path_params_schema.safeParse(ctx.req.param());
             const query_params = query_params_schema.safeParse(ctx.req.query());
-            
+
             if (path_params.success && query_params.success) {
                 return makeUsageQuery(
                     ctx,
                     endpoint,
                     {
-                        ...path_params.data,
+                        ...path_params.data as ValidUserParams<typeof endpoint>,
                         ...query_params.data
                     } as ValidUserParams<typeof endpoint>
                 );
