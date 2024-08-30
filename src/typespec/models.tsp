@@ -18,14 +18,9 @@ namespace Models {
     }
 
     model Blocks {
-        //...Clock, # Can't use it yet, need to update the Raw Blocks substream
-        // Clock
-        time: utcDateTime,
-        number: uint64,
-        hash: string, // 'EVM Hash'
-        date: plainDate,
+        ...Clock,
         // Header
-        parent_hash: string, // 'Hash'
+        previous: string, // 'Hash'
         producer: string, // 'Address'
         confirmed: uint32,
         schedule_version: uint32,
@@ -81,7 +76,7 @@ namespace Models {
         json_data: string, // 'JSON'
         raw_data: string, // 'Hex'
         // Trace
-        index: uint32, // 'Action Ordinal'
+        action_ordinal: uint32,
         receiver: string,
         context_free: boolean,
         elapsed: int64,
@@ -95,23 +90,22 @@ namespace Models {
         action_mroot: string, // 'Hash'
     }
 
-    model DBOps {
+    model Receivers {
         ...Clock,
-        ...Transaction,
-        // Storage changes
-        index: uint32,
-        operation: string, // 'Operation'
-        operation_code: uint8,
-        action_index: uint32,
-        code: string,
-        scope: string,
-        table_name: string,
-        primary_key: string,
-        old_payer: string,
-        new_payer: string,
-        old_data: string,
-        new_data: string,
-        old_data_json: string,
-        new_data_json: string,
+        // Transaction
+        tx_hash: string,
+        // Action
+        action_ordinal: uint32,
+        receiver: string,
+    }
+
+    model Authorizations {
+        ...Clock,
+        // Transaction
+        tx_hash: string,
+        // Action
+        action_ordinal: uint32,
+        actor: string,
+        permission: string,
     }
 }

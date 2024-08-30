@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { operations, paths } from './zod.gen.js';
+import { UsageBlocksDateQueryParamsSchema, operations, paths } from './zod.gen.js';
 
 type GetEndpoints = typeof paths;
 export type EndpointReturnTypes<E extends keyof GetEndpoints> = z.infer<GetEndpoints[E]["get"]["responses"]["default"]>;
@@ -18,7 +18,12 @@ export type ValidUserParams<E extends UsageEndpoints> = NonNullable<EndpointPara
     z.infer<EndpointParameters<E>["query"]>
     :
     z.infer<EndpointParameters<E>["query"] & ValidPathParams<E>>>;
-export type AdditionalQueryParams = { offset?: number; };
+export type AdditionalQueryParams = {
+    limit?: number;
+    // Have to pick any usage query params schema as codegen doesn't provide a separate schema for individual query params
+    order_by?: NonNullable<UsageBlocksDateQueryParamsSchema>["order_by"];
+    offset?: number;
+};
 // Allow any valid parameters from the endpoint to be used as SQL query parameters
 export type ValidQueryParams = ValidUserParams<UsageEndpoints> & AdditionalQueryParams;
 

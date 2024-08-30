@@ -14,6 +14,9 @@
       "name": "Usage"
     },
     {
+      "name": "Search"
+    },
+    {
       "name": "Blocks"
     },
     {
@@ -23,7 +26,10 @@
       "name": "Actions"
     },
     {
-      "name": "DBOps"
+      "name": "Receivers"
+    },
+    {
+      "name": "Authorizations"
     },
     {
       "name": "Docs"
@@ -52,23 +58,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -136,23 +167,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -219,23 +275,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -255,6 +336,766 @@
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Models.Actions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/actions/number/{number}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Actions"
+        ],
+        "operationId": "Usage_actionsNumber",
+        "summary": "Actions",
+        "description": "Actions by block number.",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint64"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of actions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Actions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/authorizations/action/{ordinal}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Authorizations"
+        ],
+        "operationId": "Usage_authorizationsAction",
+        "summary": "Authorizations by action ordinal",
+        "description": "Authorizations by action ordinal.",
+        "parameters": [
+          {
+            "name": "ordinal",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of authorizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Authorizations"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/authorizations/actor/{actor}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Authorizations"
+        ],
+        "operationId": "Usage_authorizationsActor",
+        "summary": "Authorizations by actor",
+        "description": "Authorizations by actor.",
+        "parameters": [
+          {
+            "name": "actor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of authorizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Authorizations"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/authorizations/date/{date}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Authorizations"
+        ],
+        "operationId": "Usage_authorizationsDate",
+        "summary": "Authorizations by date",
+        "description": "Authorizations by date.",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of authorizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Authorizations"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/authorizations/number/{number}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Authorizations"
+        ],
+        "operationId": "Usage_authorizationsNumber",
+        "summary": "Authorizations by block number",
+        "description": "Authorizations by block number.",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint64"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of authorizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Authorizations"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/authorizations/permission/{permission}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Authorizations"
+        ],
+        "operationId": "Usage_authorizationsPermission",
+        "summary": "Authorizations by permission",
+        "description": "Authorizations by permission.",
+        "parameters": [
+          {
+            "name": "permission",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of authorizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Authorizations"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/authorizations/transaction/{hash}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Authorizations"
+        ],
+        "operationId": "Usage_authorizationsTransaction",
+        "summary": "Authorizations by transaction hash",
+        "description": "Authorizations by transaction hash.",
+        "parameters": [
+          {
+            "name": "hash",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of authorizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Authorizations"
                       }
                     },
                     "meta": {
@@ -303,23 +1144,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -386,23 +1252,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -470,23 +1361,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -506,256 +1422,6 @@
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Models.Blocks"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/ResponseMetadata"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
-    "/dbops/date/{date}": {
-      "get": {
-        "tags": [
-          "Usage",
-          "DBOps"
-        ],
-        "operationId": "Usage_dbopsDate",
-        "summary": "DBOps",
-        "description": "DBOp by date.",
-        "parameters": [
-          {
-            "name": "date",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "uint64",
-              "default": 10
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "uint64",
-              "default": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Array of dbops.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Models.DBOps"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/ResponseMetadata"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
-    "/dbops/pk/{pk}": {
-      "get": {
-        "tags": [
-          "Usage",
-          "DBOps"
-        ],
-        "operationId": "Usage_dbopsPk",
-        "summary": "DBOps",
-        "description": "DBOp by primary key.",
-        "parameters": [
-          {
-            "name": "pk",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "uint64",
-              "default": 10
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "uint64",
-              "default": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Array of dbops.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Models.DBOps"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/ResponseMetadata"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
-    "/dbops/scope/{scope}": {
-      "get": {
-        "tags": [
-          "Usage",
-          "DBOps"
-        ],
-        "operationId": "Usage_dbopsScope",
-        "summary": "DBOps",
-        "description": "DBOps by contract.DBOp by scope.",
-        "parameters": [
-          {
-            "name": "scope",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "uint64",
-              "default": 10
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "uint64",
-              "default": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Array of dbops.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Models.DBOps"
                       }
                     },
                     "meta": {
@@ -884,6 +1550,697 @@
         }
       }
     },
+    "/receivers/action/{ordinal}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Receivers"
+        ],
+        "operationId": "Usage_receiversAction",
+        "summary": "Receivers by action ordinal",
+        "description": "Receivers by action ordinal.",
+        "parameters": [
+          {
+            "name": "ordinal",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of receivers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Receivers"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/receivers/date/{date}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Receivers"
+        ],
+        "operationId": "Usage_receiversDate",
+        "summary": "Receivers by date",
+        "description": "Receivers by date.",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of receivers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Receivers"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/receivers/number/{number}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Receivers"
+        ],
+        "operationId": "Usage_receiversNumber",
+        "summary": "Receivers by block number",
+        "description": "Receivers by block number.",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint64"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of receivers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Receivers"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/receivers/receiver/{receiver}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Receivers"
+        ],
+        "operationId": "Usage_receiversReceiver",
+        "summary": "Receivers by receiver",
+        "description": "Receivers by receiver.",
+        "parameters": [
+          {
+            "name": "receiver",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of receivers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Receivers"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/receivers/transaction/{hash}": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Receivers"
+        ],
+        "operationId": "Usage_receiversTransaction",
+        "summary": "Receivers by transaction hash",
+        "description": "Receivers by transaction hash.",
+        "parameters": [
+          {
+            "name": "hash",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of receivers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Models.Receivers"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/search/transactions": {
+      "get": {
+        "tags": [
+          "Usage",
+          "Search"
+        ],
+        "operationId": "Usage_searchTransactions",
+        "summary": "Search transactions",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "auth",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hash",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "number",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "uint64"
+            }
+          },
+          {
+            "name": "receiver",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 10
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SearchTransactions"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
     "/transactions/date/{date}": {
       "get": {
         "tags": [
@@ -904,23 +2261,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -987,23 +2369,48 @@
             }
           },
           {
-            "name": "limit",
+            "name": "first",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
+              "format": "int64",
               "default": 10
             }
           },
           {
-            "name": "page",
+            "name": "skip",
             "in": "query",
             "required": false,
             "schema": {
               "type": "integer",
-              "format": "uint64",
-              "default": 1
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_number"
+              ],
+              "default": "block_number"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
             }
           }
         ],
@@ -1149,7 +2556,7 @@
           "name",
           "json_data",
           "raw_data",
-          "index",
+          "action_ordinal",
           "receiver",
           "context_free",
           "elapsed",
@@ -1228,7 +2635,7 @@
           "raw_data": {
             "type": "string"
           },
-          "index": {
+          "action_ordinal": {
             "type": "integer",
             "format": "uint32"
           },
@@ -1268,14 +2675,57 @@
           }
         }
       },
+      "Models.Authorizations": {
+        "type": "object",
+        "required": [
+          "block_time",
+          "block_number",
+          "block_hash",
+          "block_date",
+          "tx_hash",
+          "action_ordinal",
+          "actor",
+          "permission"
+        ],
+        "properties": {
+          "block_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "block_number": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "block_hash": {
+            "type": "string"
+          },
+          "block_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "tx_hash": {
+            "type": "string"
+          },
+          "action_ordinal": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string"
+          }
+        }
+      },
       "Models.Blocks": {
         "type": "object",
         "required": [
-          "time",
-          "number",
-          "hash",
-          "date",
-          "parent_hash",
+          "block_time",
+          "block_number",
+          "block_hash",
+          "block_date",
+          "previous",
           "producer",
           "confirmed",
           "schedule_version",
@@ -1294,22 +2744,22 @@
           "total_db_ops"
         ],
         "properties": {
-          "time": {
+          "block_time": {
             "type": "string",
             "format": "date-time"
           },
-          "number": {
+          "block_number": {
             "type": "integer",
             "format": "uint64"
           },
-          "hash": {
+          "block_hash": {
             "type": "string"
           },
-          "date": {
+          "block_date": {
             "type": "string",
             "format": "date"
           },
-          "parent_hash": {
+          "previous": {
             "type": "string"
           },
           "producer": {
@@ -1374,7 +2824,7 @@
           }
         }
       },
-      "Models.DBOps": {
+      "Models.Receivers": {
         "type": "object",
         "required": [
           "block_time",
@@ -1382,24 +2832,8 @@
           "block_hash",
           "block_date",
           "tx_hash",
-          "tx_index",
-          "tx_status",
-          "tx_status_code",
-          "tx_success",
-          "index",
-          "operation",
-          "operation_code",
-          "action_index",
-          "code",
-          "scope",
-          "table_name",
-          "primary_key",
-          "old_payer",
-          "new_payer",
-          "old_data",
-          "new_data",
-          "old_data_json",
-          "new_data_json"
+          "action_ordinal",
+          "receiver"
         ],
         "properties": {
           "block_time": {
@@ -1420,63 +2854,11 @@
           "tx_hash": {
             "type": "string"
           },
-          "tx_index": {
-            "type": "integer",
-            "format": "uint64"
-          },
-          "tx_status": {
-            "type": "string"
-          },
-          "tx_status_code": {
-            "type": "integer",
-            "format": "uint8"
-          },
-          "tx_success": {
-            "type": "boolean"
-          },
-          "index": {
+          "action_ordinal": {
             "type": "integer",
             "format": "uint32"
           },
-          "operation": {
-            "type": "string"
-          },
-          "operation_code": {
-            "type": "integer",
-            "format": "uint8"
-          },
-          "action_index": {
-            "type": "integer",
-            "format": "uint32"
-          },
-          "code": {
-            "type": "string"
-          },
-          "scope": {
-            "type": "string"
-          },
-          "table_name": {
-            "type": "string"
-          },
-          "primary_key": {
-            "type": "string"
-          },
-          "old_payer": {
-            "type": "string"
-          },
-          "new_payer": {
-            "type": "string"
-          },
-          "old_data": {
-            "type": "string"
-          },
-          "new_data": {
-            "type": "string"
-          },
-          "old_data_json": {
-            "type": "string"
-          },
-          "new_data_json": {
+          "receiver": {
             "type": "string"
           }
         }
@@ -1557,33 +2939,6 @@
           }
         }
       },
-      "Pagination": {
-        "type": "object",
-        "required": [
-          "next_page",
-          "previous_page",
-          "total_pages",
-          "total_results"
-        ],
-        "properties": {
-          "next_page": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "previous_page": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "total_pages": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "total_results": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "QueryStatistics": {
         "type": "object",
         "required": [
@@ -1609,9 +2964,6 @@
         "type": "object",
         "required": [
           "statistics",
-          "next_page",
-          "previous_page",
-          "total_pages",
           "total_results"
         ],
         "properties": {
@@ -1624,21 +2976,144 @@
             ],
             "nullable": true
           },
-          "next_page": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "previous_page": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "total_pages": {
-            "type": "integer",
-            "format": "int64"
-          },
           "total_results": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "SearchTransactions": {
+        "type": "object",
+        "required": [
+          "block_time",
+          "block_number",
+          "block_hash",
+          "block_date",
+          "hash",
+          "index",
+          "elapsed",
+          "net_usage",
+          "scheduled",
+          "cpu_usage_micro_seconds",
+          "net_usage_words",
+          "status",
+          "status_code",
+          "success",
+          "transaction_mroot",
+          "actions",
+          "authorizations",
+          "receivers"
+        ],
+        "properties": {
+          "block_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "block_number": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "block_hash": {
+            "type": "string"
+          },
+          "block_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "index": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "elapsed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "net_usage": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "scheduled": {
+            "type": "boolean"
+          },
+          "cpu_usage_micro_seconds": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "net_usage_words": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "status_code": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "transaction_mroot": {
+            "type": "string"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Models.Actions"
+            }
+          },
+          "authorizations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tx_hash": {
+                  "type": "string"
+                },
+                "action_ordinal": {
+                  "type": "integer",
+                  "format": "uint32"
+                },
+                "actor": {
+                  "type": "string"
+                },
+                "permission": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "tx_hash",
+                "action_ordinal",
+                "actor",
+                "permission"
+              ]
+            }
+          },
+          "receivers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tx_hash": {
+                  "type": "string"
+                },
+                "action_ordinal": {
+                  "type": "integer",
+                  "format": "uint32"
+                },
+                "receiver": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "tx_hash",
+                "action_ordinal",
+                "receiver"
+              ]
+            }
           }
         }
       },

@@ -26,6 +26,8 @@
           SwaggerUIStandalonePreset
         ],
         layout: "StandaloneLayout",
+        filter: true,
+        tagsSorter: ((a, b) => a === "Usage" ? 1 : (b === "Usage" || b === "Docs" || b === "Monitoring" ? -1 : a.localeCompare(b)))
       });
     };
   </script>
