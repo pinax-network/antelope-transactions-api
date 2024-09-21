@@ -10,9 +10,9 @@ export const DEFAULT_HOST = "http://localhost:8123";
 export const DEFAULT_DATABASE = "default";
 export const DEFAULT_USERNAME = "default";
 export const DEFAULT_PASSWORD = "";
-export const DEFAULT_MAX_LIMIT = 10000;
+export const DEFAULT_MAX_LIMIT = 500;
 export const DEFAULT_VERBOSE = false;
-export const DEFAULT_SORT_BY = "DESC";
+export const DEFAULT_SORT_BY = "ASC";
 export const APP_NAME = pkg.name;
 export const APP_VERSION = {
     version: pkg.version,

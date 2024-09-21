@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { UsageBlocksDateQueryParamsSchema, operations, paths } from './zod.gen.js';
+import { operations, paths } from './zod.gen.js';
 
 type GetEndpoints = typeof paths;
 export type EndpointReturnTypes<E extends keyof GetEndpoints> = z.infer<GetEndpoints[E]["get"]["responses"]["default"]>;
@@ -13,25 +13,27 @@ export type UsageResponse<E extends UsageEndpoints> = EndpointReturnTypes<E>["da
 export type UsageParameters<E extends UsageEndpoints> = EndpointParameters<E>;
 
 export type ValidPathParams<E extends UsageEndpoints> = EndpointParameters<E>["path"];
-export type ValidUserParams<E extends UsageEndpoints> = NonNullable<EndpointParameters<E> extends { path: undefined; } ?
-    // Combine path and query parameters only if path exists to prevent "never" on intersection
-    z.infer<EndpointParameters<E>["query"]>
-    :
-    z.infer<EndpointParameters<E>["query"] & ValidPathParams<E>>>;
+// export type ValidUserParams<E extends UsageEndpoints> = NonNullable<EndpointParameters<E> extends { path: undefined; } ?
+//     // Combine path and query parameters only if path exists to prevent "never" on intersection
+//     z.infer<EndpointParameters<E>["query"]>
+//     :
+//     z.infer<EndpointParameters<E>["query"] & ValidPathParams<E>>>;
+
 export type AdditionalQueryParams = {
     limit?: number;
-    // Have to pick any usage query params schema as codegen doesn't provide a separate schema for individual query params
-    order_by?: NonNullable<UsageBlocksDateQueryParamsSchema>["order_by"];
     offset?: number;
+    order_by?: string;
+    order_direction?: string;
 };
 // Allow any valid parameters from the endpoint to be used as SQL query parameters
-export type ValidQueryParams = ValidUserParams<UsageEndpoints> & AdditionalQueryParams;
+// export type ValidQueryParams = ValidUserParams<UsageEndpoints> & AdditionalQueryParams;
+export type ValidQueryParams = AdditionalQueryParams;
 
 // Map stripped operations name (e.g. `Usage_transfers` stripped to `transfers`) to endpoint paths (e.g. `/transfers`)
 // This is used to map GraphQL operations to REST endpoints
 export const usageOperationsToEndpointsMap = Object.entries(operations).filter(([k, _]) => k.startsWith("Usage")).reduce(
     (o, [k, v]) => Object.assign(
-        o, 
+        o,
         {
             // Split once on first underscore to create keys (e.g. `Usage_transfersAccount` => `transfersAccount`)
             [k.split('_')[1] as string]: Object.entries(paths).find(([_, v_]) => v_.get === v)?.[0]

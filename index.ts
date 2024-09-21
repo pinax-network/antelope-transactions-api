@@ -1,6 +1,4 @@
 import { Hono, type Context } from "hono";
-import { type RootResolver, graphqlServer } from '@hono/graphql-server';
-import { buildSchema } from 'graphql';
 import { z } from 'zod';
 
 import client from './src/clickhouse/client.js';
@@ -10,7 +8,7 @@ import { APP_VERSION } from "./src/config.js";
 import { logger } from './src/logger.js';
 import { makeUsageQuery } from "./src/usage.js";
 import { APIErrorResponse } from "./src/utils.js";
-import { usageOperationsToEndpointsMap, type EndpointReturnTypes, type UsageEndpoints, type ValidUserParams } from "./src/types/api.js";
+import { usageOperationsToEndpointsMap, type EndpointReturnTypes, type UsageEndpoints } from "./src/types/api.js";
 import { paths } from './src/types/zod.gen.js';
 
 async function AntelopeTransactionsAPI() {
@@ -95,9 +93,9 @@ async function AntelopeTransactionsAPI() {
                     ctx,
                     endpoint,
                     {
-                        ...path_params.data as ValidUserParams<typeof endpoint>,
-                        ...query_params.data
-                    } as ValidUserParams<typeof endpoint>
+                        ...path_params.data as any,
+                        ...query_params.data as any
+                    }
                 );
             } else {
                 return APIErrorResponse(ctx, 400, "bad_query_input", { ...path_params.error, ...query_params.error });
@@ -107,61 +105,6 @@ async function AntelopeTransactionsAPI() {
 
     // Create all API endpoints interacting with DB
     Object.values(usageOperationsToEndpointsMap).forEach(e => createUsageEndpoint(e));
-
-    // ------------------------
-    // --- GraphQL endpoint ---
-    // ------------------------
-
-    // TODO: Make GraphQL endpoint use the same $SERVER parameter as Swagger if set ?
-    const schema = buildSchema(await Bun.file("./static/@openapi-to-graphql/graphql/schema.graphql").text());
-    const filterFields: Array<keyof typeof usageOperationsToEndpointsMap> = ['metrics'];
-
-    // @ts-ignore Ignore private field warning for filtering out certain operations from the schema
-    filterFields.forEach(f => delete schema._queryType._fields[f]);
-
-    const rootResolver: RootResolver = async (ctx?: Context) => {
-        if (ctx) {
-            // GraphQL resolver uses the same SQL queries backend as the REST API (`makeUsageQuery`)
-            const createGraphQLUsageResolver = (endpoint: UsageEndpoints) => 
-                async (args: ValidUserParams<typeof endpoint>) => {
-                    return await (await makeUsageQuery(ctx, endpoint, { ...args })).json();
-                };
-
-            
-            return Object.keys(usageOperationsToEndpointsMap).reduce(
-                // SQL queries endpoints
-                (resolver, op) => Object.assign(
-                    resolver,
-                    {
-                        [op]: createGraphQLUsageResolver(usageOperationsToEndpointsMap[op] as UsageEndpoints)
-                    }
-                ),
-                // Other endpoints
-                {
-                    health: async () => {
-                        const response = await client.ping();
-                        return response.success ? "OK" : `[500] bad_database_response: ${response.error.message}`;
-                    },
-                    openapi: () => openapi,
-                    metrics: async () => await prometheus.registry.metrics(),
-                    version: () => APP_VERSION
-                }
-            );
-        }
-    };
-
-    // TODO: Find way to log GraphQL queries (need to workaround middleware consuming Request)
-    // See: https://github.com/honojs/middleware/issues/81
-    //app.use('/graphql', async (ctx: Context) => logger.trace(await ctx.req.json()))
-
-    app.use(
-        '/graphql',
-        graphqlServer({
-            schema,
-            rootResolver,
-            graphiql: true, // if `true`, presents GraphiQL when the GraphQL endpoint is loaded in a browser.
-        })
-    );
 
     // -------------
     // --- Miscs ---
