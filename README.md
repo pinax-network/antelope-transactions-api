@@ -11,67 +11,56 @@
 
 ### Usage
 
-| Method | Path | Query parameters<br>(* = **Required**) | Description |
-| :---: | --- | --- | --- |
-| GET <br>`text/html` | `/` | - | [Swagger](https://swagger.io/) API playground |
-| GET<br>`application/json` | `/actions/account/{account}` | **`account*`** | Actions by account |
-| GET<br>`application/json` | `/actions/date/{date}` | **`date*`** | Actions by date |
-| GET<br>`application/json` | `/actions/name/{name}` | **`name*`** | Actions by name |
-| GET<br>`application/json` | `/actions/number/{number}` | **`number*`** | Actions by number |
-| GET<br>`application/json` | `/authorizations/actor/{actor}` | **`actor*`** | Authorizations by actor |
-| GET<br>`application/json` | `/authorizations/date/{date}` | **`date*`** | Authorizations by date |
-| GET<br>`application/json` | `/authorizations/number/{number}` | **`number*`** | Authorizations by number |
-| GET<br>`application/json` | `/authorizations/permission/{permission}` | **`permission*`** | Authorizations by permission |
-| GET<br>`application/json` | `/authorizations/transaction/{hash}` | **`hash*`** | Authorizations by hash |
-| GET<br>`application/json` | `/blocks/date/{date}` | **`date*`** | Blocks by date |
-| GET<br>`application/json` | `/blocks/hash/{hash}` | **`hash*`** | Blocks by hash |
-| GET<br>`application/json` | `/blocks/number/{number}` | **`number*`** | Blocks by number |
-| GET<br>`application/json` | `/receivers/date/{date}` | **`date*`** | Receivers by date |
-| GET<br>`application/json` | `/receivers/number/{number}` | **`number*`** | Receivers by number |
-| GET<br>`application/json` | `/receivers/receiver/{receiver}` | **`receiver*`** | Receivers by receiver |
-| GET<br>`application/json` | `/receivers/transaction/{hash}` | **`hash*`** | Receivers by hash |
-| GET<br>`application/json` | `/search/transactions` | `account`<br>`action`<br>`auth`<br>`hash`<br>`number`<br>`receiver` | Search transactions, requires at least one parameter |
-| GET<br>`application/json` | `/transactions/date/{date}` | **`date*`** | Transactions by date |
-| GET<br>`application/json` | `/transactions/hash/{hash}` | **`hash*`** | Transactions by hash |
+| Path | Description |
+| :------ | ----------- |
+| GET `/actions/tx_hash/{tx_hash}` | Actions by transaction |
+| GET `/authorizations/tx_hash/{tx_hash}` | Authorizations by transaction |
+| GET `/blocks/date/{date}` | Blocks by date |
+| GET `/blocks/hash/{hash}` | Blocks by hash |
+| GET `/blocks/number/{number}` | Blocks by number |
+| GET `/db_ops/tx_hash/{tx_hash}` | Database operations by transaction |
+| GET `/transactions/block_date/{block_date}` | Transactions by date |
+| GET `/transactions/block_number/{block_number}` | Transactions by block |
+| GET `/transactions/hash/{hash}` | Transactions by hash |
 
 > [!NOTE]
 > All endpoints support `first`, `skip`, `order_by`, `order_direction` as additional query parameters.
 
 ### Docs
 
-| Method | Path | Description |
-| :---: | --- | --- |
-| GET <br>`application/json` | `/openapi` | [OpenAPI](https://www.openapis.org/) specification |
-| GET <br>`application/json` | `/version` | API version and Git short commit hash |
+| Path | Description |
+| :--- | ----------- |
+| GET `/openapi` | [OpenAPI](https://www.openapis.org/) specification |
+| GET `/version` | API version and Git short commit hash |
 
 ### Monitoring
 
-| Method | Path | Description |
-| :---: | --- | --- |
-| GET <br>`text/plain` | `/health` | Checks database connection |
-| GET <br>`text/plain` | `/metrics` | [Prometheus](https://prometheus.io/) metrics |
-
-## GraphQL
-
-Go to `/graphql` for a GraphIQL interface.
+| Path | Description |
+| :--- | ----------- |
+| GET `/health` | Checks database connection |
+| GET `/metrics` | [Prometheus](https://prometheus.io/) metrics |
 
 ### `X-Api-Key`
 
 Use the `Variables` tab at the bottom to add your API key:
+
+Get API key: <https://app.pinax.network/>
+
 ```json
 {
-  "X-Api-Key": "changeme"
+  "X-Api-Key": "PINAX_API_KEY"
 }
 ```
 
 ### Additional notes
 
-- Don't forget to request the `meta` fields in the response to get access to pagination and statistics !
+- The response contains pagination and statistics.
 
 ## Requirements
 
-- [ClickHouse](clickhouse.com/), databases should follow a `{chain}_transactions_{version}` naming scheme. Database tables can be setup using the [`schema.sql`](./schema.sql) definitions created by the [`create_schema.sh`](./create_schema.sh) script.
-- A [Substream sink](https://substreams.streamingfast.io/reference-and-specs/glossary#sink) for loading data into ClickHouse. We recommend [Substreams Sink ClickHouse](https://github.com/pinax-network/substreams-sink-clickhouse/) or [Substreams Sink SQL](https://github.com/pinax-network/substreams-sink-sql). You should use the generated [`protobuf` files](static/@typespec/protobuf) to build your substream. This Transactions API makes use of the [`antelope-transactions-substreams`](https://github.com/pinax-network/antelope-transactions-substreams/).
+- [ClickHouse](clickhouse.com/), databases should follow a `{chain}_transactions_{version}` naming scheme.
+- The [`substreams-raw-blocks`](https://github.com/pinax-network/substreams-raw-blocks/) Antelope spkg will be used as data source.
+- A [Substream sink](https://substreams.streamingfast.io/reference-and-specs/glossary#sink) for loading data into ClickHouse. We recommend [Substreams Sink SQL](https://github.com/pinax-network/substreams-sink-sql/).
 
 ### API stack architecture
 
@@ -111,7 +100,7 @@ cat /tmp/schema.sql | clickhouse client -h <host> --port 9000 -d <database> -u <
 
 ```console
 substreams-sink-sql run clickhouse://<username>:<password>@<host>:9000/eos_transactions_v1 \
-https://github.com/pinax-network/antelope-transactions-substreams/releases/download/v0.1.1/antelope-transactions-v0.1.1.spkg `#Substreams package` \
+https://github.com/pinax-network/substreams-raw-blocks/releases/download/antelope-v0.3.0/raw-blocks-antelope-v0.3.0.spkg `#Substreams package` \
 -e eos.substreams.pinax.network:443 `#Substreams endpoint` \
 1: `#Block range <start>:<end>` \
 --final-blocks-only --undo-buffer-size 1 --on-module-hash-mistmatch=warn --batch-block-flush-interval 100 --development-mode `#Additional flags`
@@ -134,7 +123,7 @@ If you run ClickHouse in a [cluster](https://clickhouse.com/docs/en/architecture
 echo "CREATE DATABASE eos_transactions_v1 ON CLUSTER <cluster>" | clickhouse client -h <host> --port 9000 -d <database> -u <user> --password <password>
 ```
 
-3. Run the [`create_schema.sh`](./create_schema.sh) script
+3. ~~Run the [`create_schema.sh`](./create_schema.sh) script~~ (SQL Sink should handle creating schema)
 
 ```console
 ./create_schema.sh -o /tmp/schema.sql -c <cluster>
@@ -148,9 +137,9 @@ echo "CREATE DATABASE eos_transactions_v1 ON CLUSTER <cluster>" | clickhouse cli
 > Linux x86 only
 
 ```console
-$ wget https://github.com/pinax-network/antelope-transactions-api/releases/download/v0.2.0/antelope-transactions-api
+$ wget https://github.com/pinax-network/antelope-transactions-api/releases/download/v0.3.0/antelope-transactions-api
 $ chmod +x ./antelope-transactions-api
-$ ./antelope-transactions-api --help                                                                          
+$ ./antelope-transactions-api --help
 Usage: antelope-transactions-api [options]
 
 Transactions information from the Antelope blockchains
@@ -191,21 +180,25 @@ VERBOSE=true
 - Pull from GitHub Container registry
 
 **For latest tagged release**
+
 ```bash
 docker pull ghcr.io/pinax-network/antelope-transactions-api:latest
 ```
 
 **For head of `main` branch**
+
 ```bash
 docker pull ghcr.io/pinax-network/antelope-transactions-api:develop
 ```
 
 - Build from source
+
 ```bash
 docker build -t antelope-transactions-api .
 ```
 
 - Run with `.env` file
+
 ```bash
 docker run -it --rm --env-file .env ghcr.io/pinax-network/antelope-transactions-api
 ```
@@ -219,12 +212,13 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 Install [Bun](https://bun.sh/)
 
 ```console
-$ bun install
-$ bun dev
+bun install
+bun dev
 ```
 
 **Tests**
+
 ```console
-$ bun lint
-$ bun test
+bun lint
+bun test
 ```

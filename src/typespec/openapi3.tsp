@@ -5,14 +5,16 @@ import "./models.tsp";
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
 
-@service({ title: "Antelope Transactions Api" })
+@service({
+    title: "Antelope Transactions Api",
+})
 @info({
     summary: "Transactions information from the Antelope blockchains, powered by Substreams",
     license: {
         name: "MIT",
-        url: "https://github.com/pinax-network/antelope-transactions-api/blob/75db1c61477ac7ea5e56f775cefe54875af953d4/LICENSE"
+        url: "https://github.com/pinax-network/antelope-transactions-api/blob/75db1c61477ac7ea5e56f775cefe54875af953d4/LICENSE",
     },
-    version: "0.2.0"
+    version: "0.3.0",
 }) // From @typespec/openapi
 //@server("https://eos.api.pinax.network/v1", "EOS V1 Api Endpoint")
 namespace AntelopeTransactionsApi;
@@ -35,368 +37,170 @@ alias ErrorStatusCode = 500 | 504 | 400 | 401 | 403 | 404 | 405;
 
 @error
 model ApiError {
-    status: ErrorStatusCode,
-    code: ApiErrorCode,
-    message: string,
+    status: ErrorStatusCode;
+    code: ApiErrorCode;
+    message: string;
 }
-
-model QueryStatistics {
-    elapsed: float,
-    rows_read: safeint,
-    bytes_read: safeint,
-}
-
-model ResponseMetadata {
-    statistics: QueryStatistics | null,
-    total_results: safeint,
-}
-
 model UsageResponse<T> {
-    data: T[],
-    meta: ResponseMetadata,
-}
-
-model SearchTransactions {
-    ...Models.Transactions,
-    actions: Models.Actions[],
-    authorizations: {
-        tx_hash: Models.Authorizations.tx_hash,
-        action_ordinal: Models.Authorizations.action_ordinal,
-        actor: Models.Authorizations.actor,
-        permission: Models.Authorizations.permission,
-    }[],
-    receivers: {
-        tx_hash: Models.Receivers.tx_hash,
-        action_ordinal: Models.Receivers.action_ordinal,
-        receiver: Models.Receivers.receiver,
-    }[],
+    data: T[];
+    statistics: {
+        elapsed: float;
+        rows_read: safeint;
+        bytes_read: safeint;
+    };
+    rows: safeint;
+    rows_before_limit_at_least: safeint;
+    meta: {
+        name: string;
+        type: string;
+    }[];
 }
 
 // Alias will *not* be present in the OpenAPI components.
 // This also helps preventing self-references in generated `components` for codegen to work properly.
 alias ApiResponse<T> = T | ApiError;
+
+alias PaginationFilters = {
+    @query first?: safeint = 20;
+    @query skip?: safeint = 0;
+};
+
+alias OrderDirection = {
+    @query order_direction?: "asc" | "desc" = "asc";
+};
+
+alias BlockNumberFilters = {
+    @query block_number?: safeint;
+    @query block_date?: plainDate;
+};
+
 alias Filters = {
-    @query first?: safeint = 10,
-    @query skip?: safeint = 0,
-    @query order_by?: "block_number" = "block_number",
-    @query order_direction?: "asc" | "desc" = "desc",
+    ...PaginationFilters;
+    ...BlockNumberFilters;
 };
 
 @tag("Usage") // Important: all endpoints querying the ClickHouse backend must be under this tagged interface
 interface Usage {
-    @tag("Search")
-    @summary("Search transactions")
-    @route("/search/transactions")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    searchTransactions(
-        @query account?: Models.Actions.account,
-        @query action?: Models.Actions.name,
-        @query auth?: Models.Authorizations.actor,
-        @query hash?: Models.Transactions.hash,
-        @query number?: Models.Transactions.block_number,
-        @query receiver?: Models.Receivers.receiver,
-        ...Filters,
-    ): ApiResponse<UsageResponse<SearchTransactions>>;
-
     // ===========================================================
     // Blocks
     // ===========================================================
+    @tag("Blocks")
+    @summary("Blocks by number")
+    @route("/blocks/number/{number}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    blocksByNumber(
+        @path number: Models.Blocks.number,
+    ): ApiResponse<UsageResponse<Models.Blocks>>;
 
-    /**
-        Blocks by hash.
-        @returns Array of blocks.
-    */
     @tag("Blocks")
     @summary("Blocks by hash")
     @route("/blocks/hash/{hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    blocksHash(
-        @path hash: Models.Blocks.block_hash,
-        ...Filters,
+    blocksByHash(
+        @path hash: Models.Blocks.hash,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
 
-    /**
-        Blocks by block number.
-        @returns Array of blocks.
-    */
-    @tag("Blocks")
-    @summary("Blocks by block number")
-    @route("/blocks/number/{number}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    blocksNumber(
-        @path number: Models.Blocks.block_number,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Blocks>>;
-
-    /**
-        Blocks by date.
-        @returns Array of blocks.
-    */
     @tag("Blocks")
     @summary("Blocks by date")
     @route("/blocks/date/{date}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    blocksDate(
-        @path date: Models.Blocks.block_date,
-        ...Filters,
+    blocksByDate(
+        @path date: Models.Blocks.date,
+        @query order_by?: "number" = "number",
+        ...OrderDirection,
+        ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Blocks>>;
 
     // ===========================================================
     // Transactions
     // ===========================================================
-
-    /**
-        Transactions by hash.
-        @returns Array of transactions.
-    */
     @tag("Transactions")
     @summary("Transactions by hash")
     @route("/transactions/hash/{hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    transactionsHash(
+    transactionsByHash(
         @path hash: Models.Transactions.hash,
-        ...Filters,
     ): ApiResponse<UsageResponse<Models.Transactions>>;
 
-    /**
-        Transactions by date.
-        @returns Array of transactions.
-    */
     @tag("Transactions")
-    @summary("Transactions")
-    @route("/transactions/date/{date}")
+    @summary("Transactions by block")
+    @route("/transactions/block_number/{block_number}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    transactionsDate(
-        @path date: Models.Transactions.block_date,
-        ...Filters,
+    transactionsByBlockNumber(
+        @path block_number: Models.Transactions.block_number,
+        @query order_by?: "index" = "index",
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.Transactions>>;
+
+    @tag("Transactions")
+    @summary("Transactions by date")
+    @route("/transactions/block_date/{block_date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    transactionsByBlockDate(
+        @path block_date: Models.Transactions.block_date,
+
+        @query
+        order_by?: "block_number,index" | "block_number" | "index" = "block_number,index",
+
+        ...OrderDirection,
+        ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Transactions>>;
 
     // ===========================================================
     // Actions
     // ===========================================================
-
-    /**
-        Actions by block number.
-        @returns Array of actions.
-    */
     @tag("Actions")
-    @summary("Actions")
-    @route("/actions/number/{number}")
+    @summary("Actions by transaction")
+    @route("/actions/tx_hash/{tx_hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    actionsNumber(
-        @path number: Models.Actions.block_number,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Actions>>;
-
-    /**
-        Actions by name.
-        @returns Array of actions.
-    */
-    @tag("Actions")
-    @summary("Actions")
-    @route("/actions/name/{name}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    actionsName(
-        @path name: Models.Actions.name,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Actions>>;
-
-    /**
-        Actions by account.
-        @returns Array of actions.
-    */
-    @tag("Actions")
-    @summary("Actions")
-    @route("/actions/account/{account}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    actionsAccount(
-        @path account: Models.Actions.account,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Actions>>;
-
-    /**
-        Actions by date.
-        @returns Array of actions.
-    */
-    @tag("Actions")
-    @summary("Actions")
-    @route("/actions/date/{date}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    actionsDate(
-        @path date: Models.Actions.block_date,
-        ...Filters,
+    actionsByTransaction(
+        @path tx_hash: Models.Actions.tx_hash,
+        @query order_by?: "index" = "index",
+        ...OrderDirection,
+        ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Actions>>;
 
     // ===========================================================
-    // Receivers
+    // Database Operations
     // ===========================================================
-
-    /**
-        Receivers by block number.
-        @returns Array of receivers.
-    */
-    @tag("Receivers")
-    @summary("Receivers by block number")
-    @route("/receivers/number/{number}")
+    @tag("Database Operations")
+    @summary("Database operations by transaction")
+    @route("/db_ops/tx_hash/{tx_hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    receiversNumber(
-        @path number: Models.Receivers.block_number,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Receivers>>;
-
-    /**
-        Receivers by date.
-        @returns Array of receivers.
-    */
-    @tag("Receivers")
-    @summary("Receivers by date")
-    @route("/receivers/date/{date}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    receiversDate(
-        @path date: Models.Receivers.block_date,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Receivers>>;
-
-    /**
-        Receivers by transaction hash.
-        @returns Array of receivers.
-    */
-    @tag("Receivers")
-    @summary("Receivers by transaction hash")
-    @route("/receivers/transaction/{hash}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    receiversTransaction(
-        @path hash: Models.Receivers.tx_hash,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Receivers>>;
-
-    /**
-        Receivers by action ordinal.
-        @returns Array of receivers.
-    */
-    @tag("Receivers")
-    @summary("Receivers by action ordinal")
-    @route("/receivers/action/{ordinal}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    receiversAction(
-        @path ordinal: Models.Receivers.action_ordinal,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Receivers>>;
-
-    /**
-        Receivers by receiver.
-        @returns Array of receivers.
-    */
-    @tag("Receivers")
-    @summary("Receivers by receiver")
-    @route("/receivers/receiver/{receiver}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    receiversReceiver(
-        @path receiver: Models.Receivers.receiver,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Receivers>>;
+    db_ops(
+        @path tx_hash: Models.DbOps.tx_hash,
+        @query action_index?: Models.DbOps.action_index,
+        @query order_by?: "index" | "action_index" = "index",
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
 
     // ===========================================================
     // Authorizations
     // ===========================================================
-
-    /**
-        Authorizations by block number.
-        @returns Array of authorizations.
-    */
     @tag("Authorizations")
-    @summary("Authorizations by block number")
-    @route("/authorizations/number/{number}")
+    @summary("Authorizations by transaction")
+    @route("/authorizations/tx_hash/{tx_hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    authorizationsNumber(
-        @path number: Models.Authorizations.block_number,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+    authorizations(
+        @path tx_hash: Models.Authorizations.tx_hash,
+        @query action_index?: Models.Authorizations.action_index,
 
-    /**
-        Authorizations by date.
-        @returns Array of authorizations.
-    */
-    @tag("Authorizations")
-    @summary("Authorizations by date")
-    @route("/authorizations/date/{date}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    authorizationsDate(
-        @path date: Models.Authorizations.block_date,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+        @query
+        order_by?: "action_index,index" | "action_index" | "index" = "action_index,index",
 
-    /**
-        Authorizations by transaction hash.
-        @returns Array of authorizations.
-    */
-    @tag("Authorizations")
-    @summary("Authorizations by transaction hash")
-    @route("/authorizations/transaction/{hash}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    authorizationsTransaction(
-        @path hash: Models.Authorizations.tx_hash,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Authorizations>>;
-
-    /**
-        Authorizations by action ordinal.
-        @returns Array of authorizations.
-    */
-    @tag("Authorizations")
-    @summary("Authorizations by action ordinal")
-    @route("/authorizations/action/{ordinal}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    authorizationsAction(
-        @path ordinal: Models.Authorizations.action_ordinal,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Authorizations>>;
-
-    /**
-        Authorizations by actor.
-        @returns Array of authorizations.
-    */
-    @tag("Authorizations")
-    @summary("Authorizations by actor")
-    @route("/authorizations/actor/{actor}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    authorizationsActor(
-        @path actor: Models.Authorizations.actor,
-        ...Filters,
-    ): ApiResponse<UsageResponse<Models.Authorizations>>;
-
-    /**
-        Authorizations by permission.
-        @returns Array of authorizations.
-    */
-    @tag("Authorizations")
-    @summary("Authorizations by permission")
-    @route("/authorizations/permission/{permission}")
-    @get
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    authorizationsPermission(
-        @path permission: Models.Authorizations.permission,
-        ...Filters,
+        ...OrderDirection,
+        ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Authorizations>>;
 }
 
