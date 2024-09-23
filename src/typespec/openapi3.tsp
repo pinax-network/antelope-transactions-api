@@ -14,7 +14,7 @@ using TypeSpec.OpenAPI;
         name: "MIT",
         url: "https://github.com/pinax-network/antelope-transactions-api/blob/75db1c61477ac7ea5e56f775cefe54875af953d4/LICENSE",
     },
-    version: "0.3.0",
+    version: "0.3.1",
 }) // From @typespec/openapi
 //@server("https://eos.api.pinax.network/v1", "EOS V1 Api Endpoint")
 namespace AntelopeTransactionsApi;

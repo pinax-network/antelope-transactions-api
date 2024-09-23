@@ -26,7 +26,8 @@ export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, use
     for (let key in query_params) {
         if (["limit", "offset", "order_by", "order_direction", "skip", "first"].includes(key)) continue; // skip pagination params
         const value = (query_params as any)[key];
-        where.push(`${key} = {${key}: ${typeof value === "number" ? "int" : "String"}}`);
+        let isNumber = !isNaN(Number(value));
+        where.push(`"${key}" = {${key}: ${isNumber ? "int" : "String"}}`);
     }
     if (where.length) query.push(`WHERE ${where.join(" AND ")}`);
 
