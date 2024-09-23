@@ -137,7 +137,7 @@ echo "CREATE DATABASE eos_transactions_v1 ON CLUSTER <cluster>" | clickhouse cli
 > Linux x86 only
 
 ```console
-$ wget https://github.com/pinax-network/antelope-transactions-api/releases/download/v0.3.1/antelope-transactions-api
+$ wget https://github.com/pinax-network/antelope-transactions-api/releases/download/v0.3.2/antelope-transactions-api
 $ chmod +x ./antelope-transactions-api
 $ ./antelope-transactions-api --help
 Usage: antelope-transactions-api [options]
