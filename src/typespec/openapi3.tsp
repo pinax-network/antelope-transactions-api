@@ -14,7 +14,7 @@ using TypeSpec.OpenAPI;
         name: "MIT",
         url: "https://github.com/pinax-network/antelope-transactions-api/blob/75db1c61477ac7ea5e56f775cefe54875af953d4/LICENSE",
     },
-    version: "0.3.2",
+    version: "0.3.3",
 }) // From @typespec/openapi
 //@server("https://eos.api.pinax.network/v1", "EOS V1 Api Endpoint")
 namespace AntelopeTransactionsApi;
@@ -50,10 +50,10 @@ model UsageResponse<T> {
     };
     rows: safeint;
     rows_before_limit_at_least: safeint;
-    meta: {
-        name: string;
-        type: string;
-    }[];
+    // meta: {
+    //     name: string;
+    //     type: string;
+    // }[];
 }
 
 // Alias will *not* be present in the OpenAPI components.

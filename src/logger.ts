@@ -10,6 +10,7 @@ class TsLogger extends Logger<ILogObj> {
 
     public enable(type: "pretty" | "json" = "json") {
         this.settings.type = type;
+        this.settings.hideLogPositionForProduction = true;
         this.settings.minLevel = 0;
         this.info("Enabled logger");
     }
