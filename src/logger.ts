@@ -8,7 +8,7 @@ class TsLogger extends Logger<ILogObj> {
         this.settings.name = `${APP_NAME}:${APP_VERSION.version}+${APP_VERSION.commit}`;
     }
 
-    public enable(type: "pretty" | "json" = "pretty") {
+    public enable(type: "pretty" | "json" = "json") {
         this.settings.type = type;
         this.settings.minLevel = 0;
         this.info("Enabled logger");
