@@ -27,8 +27,7 @@ export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, use
         if (["limit", "offset", "order_by", "order_direction", "skip", "first"].includes(key)) continue; // skip pagination params
         const value = (query_params as any)[key];
         let isNumber = !isNaN(Number(value));
-        // where.push(`${key} = {${key}: ${isNumber ? "int" : "String"}}`);
-        where.push(`${key}='${value}'`);
+        where.push(`${key} = {${key}: ${isNumber ? "int" : "String"}}`);;
     }
     if (where.length) query.push(`WHERE ${where.join(" AND ")}`);
 
@@ -46,10 +45,7 @@ export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, use
     if (query_params.offset) query.push("OFFSET {offset: int}");
 
     try {
-        const result = await makeQuery<UsageElementReturnType>(query.join(" "), { ...query_params });
-        // Remove the `meta` key from the response
-        if (result.meta) delete result.meta;
-        return ctx.json(result);
+        return ctx.json(await makeQuery<UsageElementReturnType>(query.join(" "), { ...query_params }));
     } catch (err) {
         return APIErrorResponse(ctx, 500, "bad_database_response", err);
     }

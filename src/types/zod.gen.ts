@@ -33,7 +33,7 @@ export type UsageActionsByTransactionQueryParamsSchema = z.infer<typeof usageAct
 /**
  * @description The request has succeeded.
  */
-export const usageActionsByTransaction200Schema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageActionsByTransaction200Schema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageActionsByTransaction200Schema = z.infer<typeof usageActionsByTransaction200Schema>;
 /**
  * @description An unexpected error response.
@@ -43,7 +43,7 @@ export type UsageActionsByTransactionErrorSchema = z.infer<typeof usageActionsBy
 /**
  * @description The request has succeeded.
  */
-export const usageActionsByTransactionQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageActionsByTransactionQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageActionsByTransactionQueryResponseSchema = z.infer<typeof usageActionsByTransactionQueryResponseSchema>;
 
 
@@ -55,7 +55,7 @@ export type UsageAuthorizationsQueryParamsSchema = z.infer<typeof usageAuthoriza
 /**
  * @description The request has succeeded.
  */
-export const usageAuthorizations200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageAuthorizations200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageAuthorizations200Schema = z.infer<typeof usageAuthorizations200Schema>;
 /**
  * @description An unexpected error response.
@@ -65,7 +65,7 @@ export type UsageAuthorizationsErrorSchema = z.infer<typeof usageAuthorizationsE
 /**
  * @description The request has succeeded.
  */
-export const usageAuthorizationsQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageAuthorizationsQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageAuthorizationsQueryResponseSchema = z.infer<typeof usageAuthorizationsQueryResponseSchema>;
 
 
@@ -77,7 +77,7 @@ export type UsageBlocksByDateQueryParamsSchema = z.infer<typeof usageBlocksByDat
 /**
  * @description The request has succeeded.
  */
-export const usageBlocksByDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageBlocksByDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageBlocksByDate200Schema = z.infer<typeof usageBlocksByDate200Schema>;
 /**
  * @description An unexpected error response.
@@ -87,7 +87,7 @@ export type UsageBlocksByDateErrorSchema = z.infer<typeof usageBlocksByDateError
 /**
  * @description The request has succeeded.
  */
-export const usageBlocksByDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageBlocksByDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageBlocksByDateQueryResponseSchema = z.infer<typeof usageBlocksByDateQueryResponseSchema>;
 
 
@@ -96,7 +96,7 @@ export type UsageBlocksByHashPathParamsSchema = z.infer<typeof usageBlocksByHash
 /**
  * @description The request has succeeded.
  */
-export const usageBlocksByHash200Schema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageBlocksByHash200Schema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageBlocksByHash200Schema = z.infer<typeof usageBlocksByHash200Schema>;
 /**
  * @description An unexpected error response.
@@ -106,7 +106,7 @@ export type UsageBlocksByHashErrorSchema = z.infer<typeof usageBlocksByHashError
 /**
  * @description The request has succeeded.
  */
-export const usageBlocksByHashQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageBlocksByHashQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageBlocksByHashQueryResponseSchema = z.infer<typeof usageBlocksByHashQueryResponseSchema>;
 
 
@@ -115,7 +115,7 @@ export type UsageBlocksByNumberPathParamsSchema = z.infer<typeof usageBlocksByNu
 /**
  * @description The request has succeeded.
  */
-export const usageBlocksByNumber200Schema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageBlocksByNumber200Schema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageBlocksByNumber200Schema = z.infer<typeof usageBlocksByNumber200Schema>;
 /**
  * @description An unexpected error response.
@@ -125,7 +125,7 @@ export type UsageBlocksByNumberErrorSchema = z.infer<typeof usageBlocksByNumberE
 /**
  * @description The request has succeeded.
  */
-export const usageBlocksByNumberQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageBlocksByNumberQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsBlocksSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageBlocksByNumberQueryResponseSchema = z.infer<typeof usageBlocksByNumberQueryResponseSchema>;
 
 
@@ -137,7 +137,7 @@ export type UsageDbOpsQueryParamsSchema = z.infer<typeof usageDbOpsQueryParamsSc
 /**
  * @description The request has succeeded.
  */
-export const usageDbOps200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageDbOps200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageDbOps200Schema = z.infer<typeof usageDbOps200Schema>;
 /**
  * @description An unexpected error response.
@@ -147,7 +147,7 @@ export type UsageDbOpsErrorSchema = z.infer<typeof usageDbOpsErrorSchema>;
 /**
  * @description The request has succeeded.
  */
-export const usageDbOpsQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageDbOpsQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageDbOpsQueryResponseSchema = z.infer<typeof usageDbOpsQueryResponseSchema>;
 
  /**
@@ -207,7 +207,7 @@ export type UsageTransactionsByBlockDateQueryParamsSchema = z.infer<typeof usage
 /**
  * @description The request has succeeded.
  */
-export const usageTransactionsByBlockDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageTransactionsByBlockDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageTransactionsByBlockDate200Schema = z.infer<typeof usageTransactionsByBlockDate200Schema>;
 /**
  * @description An unexpected error response.
@@ -217,7 +217,7 @@ export type UsageTransactionsByBlockDateErrorSchema = z.infer<typeof usageTransa
 /**
  * @description The request has succeeded.
  */
-export const usageTransactionsByBlockDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageTransactionsByBlockDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageTransactionsByBlockDateQueryResponseSchema = z.infer<typeof usageTransactionsByBlockDateQueryResponseSchema>;
 
 
@@ -229,7 +229,7 @@ export type UsageTransactionsByBlockNumberQueryParamsSchema = z.infer<typeof usa
 /**
  * @description The request has succeeded.
  */
-export const usageTransactionsByBlockNumber200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageTransactionsByBlockNumber200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageTransactionsByBlockNumber200Schema = z.infer<typeof usageTransactionsByBlockNumber200Schema>;
 /**
  * @description An unexpected error response.
@@ -239,7 +239,7 @@ export type UsageTransactionsByBlockNumberErrorSchema = z.infer<typeof usageTran
 /**
  * @description The request has succeeded.
  */
-export const usageTransactionsByBlockNumberQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageTransactionsByBlockNumberQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageTransactionsByBlockNumberQueryResponseSchema = z.infer<typeof usageTransactionsByBlockNumberQueryResponseSchema>;
 
 
@@ -248,7 +248,7 @@ export type UsageTransactionsByHashPathParamsSchema = z.infer<typeof usageTransa
 /**
  * @description The request has succeeded.
  */
-export const usageTransactionsByHash200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageTransactionsByHash200Schema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageTransactionsByHash200Schema = z.infer<typeof usageTransactionsByHash200Schema>;
 /**
  * @description An unexpected error response.
@@ -258,7 +258,7 @@ export type UsageTransactionsByHashErrorSchema = z.infer<typeof usageTransaction
 /**
  * @description The request has succeeded.
  */
-export const usageTransactionsByHashQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number(), "meta": z.array(z.object({ "name": z.coerce.string(), "type": z.coerce.string() })) });
+export const usageTransactionsByHashQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsTransactionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
 export type UsageTransactionsByHashQueryResponseSchema = z.infer<typeof usageTransactionsByHashQueryResponseSchema>;
 
  /**

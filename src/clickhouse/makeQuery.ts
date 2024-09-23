@@ -11,6 +11,7 @@ export async function makeQuery<T = unknown>(query: string, query_params: ValidQ
 
     const response = await client.query({ query, query_params, format: "JSON" });
     const data: ResponseJSON<T> = await response.json();
+    if (data.meta) delete data.meta;
 
     prometheus.query.inc();
     if (data.statistics) {
@@ -20,6 +21,5 @@ export async function makeQuery<T = unknown>(query: string, query_params: ValidQ
     }
 
     logger.trace({ statistics: data.statistics, rows: data.rows, rows_before_limit_at_least: data.rows_before_limit_at_least });
-
     return data;
 }
