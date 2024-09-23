@@ -1,7 +1,7 @@
 {
   "name": "antelope-transactions-api",
   "description": "Transactions information from the Antelope blockchains",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "homepage": "https://github.com/pinax-network/antelope-transactions-api",
   "license": "MIT",
   "authors": [
