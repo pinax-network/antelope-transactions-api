@@ -11,6 +11,13 @@ import { APIErrorResponse } from "./src/utils.js";
 import { usageOperationsToEndpointsMap, type EndpointReturnTypes, type UsageEndpoints } from "./src/types/api.js";
 import { paths } from './src/types/zod.gen.js';
 
+await client.ping().then((result) => {
+    if (!result.success) {
+        logger.error(`Failed to connect to ClickHouse: ${result.error.message}`);
+        process.exit(1);
+    }
+});
+
 async function AntelopeTransactionsAPI() {
     const app = new Hono();
 
