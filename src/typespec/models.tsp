@@ -70,7 +70,7 @@ namespace Models {
         cpu_usage_micro_seconds: uint32;
 
         net_usage_words: uint32;
-        status: string; // 'Status'
+        status: "Executed";
         status_code: uint8;
         success: boolean;
 

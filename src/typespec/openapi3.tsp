@@ -79,6 +79,48 @@ alias Filters = {
     ...BlockNumberFilters;
 };
 
+alias DbOpsFilters = {
+    @query code?: Models.DbOps.code;
+    @query table_name?: Models.DbOps.table_name;
+    @query scope?: Models.DbOps.scope;
+    @query primary_key?: Models.DbOps.primary_key;
+};
+
+alias ActionsFilters = {
+    @query account?: Models.Actions.account;
+    @query name?: Models.Actions.name;
+    @query receiver?: Models.Actions.receiver;
+};
+
+alias AuthorizationsFilters = {
+    @query actor?: Models.Authorizations.actor;
+    @query permission?: Models.Authorizations.permission;
+    @query action_index?: Models.Authorizations.action_index;
+};
+
+alias OrderByBlockIndex = {
+    @query
+    order_by?: "block_number,index" | "block_number" = "block_number,index";
+};
+
+alias OrderByIndex = {
+    @query order_by?: "index" = "index";
+};
+
+alias OrderByActionIndex = {
+    @query
+    order_by?: "action_index,index" | "action_index" | "index" = "action_index,index";
+};
+
+alias OrderByBlockActionIndex = {
+    @query
+    order_by?:
+        | "block_number,action_index,index"
+        | "block_number"
+        | "action_index"
+        | "index" = "block_number,action_index,index";
+};
+
 @tag("Usage") // Important: all endpoints querying the ClickHouse backend must be under this tagged interface
 interface Usage {
     // ===========================================================
@@ -133,7 +175,7 @@ interface Usage {
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     transactionsByBlockNumber(
         @path block_number: Models.Transactions.block_number,
-        @query order_by?: "index" = "index",
+        ...OrderByIndex,
         ...OrderDirection,
         ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Transactions>>;
@@ -145,10 +187,7 @@ interface Usage {
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     transactionsByBlockDate(
         @path block_date: Models.Transactions.block_date,
-
-        @query
-        order_by?: "block_number,index" | "block_number" | "index" = "block_number,index",
-
+        ...OrderByBlockIndex,
         ...OrderDirection,
         ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Transactions>>;
@@ -163,7 +202,34 @@ interface Usage {
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
     actionsByTransaction(
         @path tx_hash: Models.Actions.tx_hash,
-        @query order_by?: "index" = "index",
+        ...ActionsFilters,
+        ...OrderByIndex,
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.Actions>>;
+
+    @tag("Actions")
+    @summary("Actions by block")
+    @route("/actions/block_number/{block_number}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    actionsByBlock(
+        @path block_number: Models.Actions.block_number,
+        ...ActionsFilters,
+        ...OrderByBlockIndex,
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.Actions>>;
+
+    @tag("Actions")
+    @summary("Actions by date")
+    @route("/actions/block_date/{block_date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    actionsByDate(
+        @path block_date: Models.Actions.block_date,
+        ...ActionsFilters,
+        ...OrderByBlockIndex,
         ...OrderDirection,
         ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Actions>>;
@@ -176,13 +242,39 @@ interface Usage {
     @route("/db_ops/tx_hash/{tx_hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    db_ops(
+    dbOpsByTransaction(
         @path tx_hash: Models.DbOps.tx_hash,
-        @query action_index?: Models.DbOps.action_index,
-        @query order_by?: "index" | "action_index" = "index",
+        ...DbOpsFilters,
+        ...OrderByIndex,
         ...OrderDirection,
         ...PaginationFilters,
-    ): ApiResponse<UsageResponse<Models.Authorizations>>;
+    ): ApiResponse<UsageResponse<Models.DbOps>>;
+
+    @tag("Database Operations")
+    @summary("Database operations by block")
+    @route("/db_ops/block_number/{block_number}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    dbOpsByBlock(
+        @path block_number: Models.DbOps.block_number,
+        ...DbOpsFilters,
+        ...OrderByIndex,
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.DbOps>>;
+
+    @tag("Database Operations")
+    @summary("Database operations by date")
+    @route("/db_ops/block_date/{block_date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    dbOpsByDate(
+        @path block_date: Models.DbOps.block_date,
+        ...DbOpsFilters,
+        ...OrderByBlockIndex,
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.DbOps>>;
 
     // ===========================================================
     // Authorizations
@@ -192,13 +284,36 @@ interface Usage {
     @route("/authorizations/tx_hash/{tx_hash}")
     @get
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
-    authorizations(
+    authorizationsByTransaction(
         @path tx_hash: Models.Authorizations.tx_hash,
-        @query action_index?: Models.Authorizations.action_index,
+        ...AuthorizationsFilters,
+        ...OrderByActionIndex,
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
 
-        @query
-        order_by?: "action_index,index" | "action_index" | "index" = "action_index,index",
+    @tag("Authorizations")
+    @summary("Authorizations by block")
+    @route("/authorizations/block_number/{block_number}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsByBlock(
+        @path block_number: Models.Authorizations.block_number,
+        ...AuthorizationsFilters,
+        ...OrderByBlockActionIndex,
+        ...OrderDirection,
+        ...PaginationFilters,
+    ): ApiResponse<UsageResponse<Models.Authorizations>>;
 
+    @tag("Authorizations")
+    @summary("Authorizations by date")
+    @route("/authorizations/block_date/{block_date}")
+    @get
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, ApiKeyHeader>)
+    authorizationsByDate(
+        @path block_date: Models.Authorizations.block_date,
+        ...AuthorizationsFilters,
+        ...OrderByBlockActionIndex,
         ...OrderDirection,
         ...PaginationFilters,
     ): ApiResponse<UsageResponse<Models.Authorizations>>;
