@@ -17,7 +17,11 @@ export const modelsBlocksSchema = z.object({ "time": z.string().datetime(), "num
 export type ModelsBlocksSchema = z.infer<typeof modelsBlocksSchema>;
 
 
-export const modelsTransactionsSchema = z.object({ "block_time": z.string().datetime(), "block_number": z.coerce.number(), "block_hash": z.coerce.string(), "block_date": z.string().date(), "hash": z.coerce.string(), "index": z.coerce.number(), "elapsed": z.coerce.number(), "net_usage": z.coerce.number(), "scheduled": z.boolean(), "cpu_usage_micro_seconds": z.coerce.number(), "net_usage_words": z.coerce.number(), "status": z.coerce.string(), "status_code": z.coerce.number(), "success": z.boolean(), "transaction_mroot": z.coerce.string() });
+export const modelsDbOpsSchema = z.object({ "block_time": z.string().datetime(), "block_number": z.coerce.number(), "block_hash": z.coerce.string(), "block_date": z.string().date(), "tx_hash": z.coerce.string(), "tx_success": z.boolean(), "action_index": z.coerce.number(), "index": z.coerce.number(), "operation": z.coerce.string(), "operation_code": z.coerce.number(), "code": z.coerce.string(), "scope": z.coerce.string(), "table_name": z.coerce.string(), "primary_key": z.coerce.string(), "old_payer": z.coerce.string(), "new_payer": z.coerce.string(), "old_data": z.coerce.string(), "new_data": z.coerce.string(), "old_data_json": z.coerce.string(), "new_data_json": z.coerce.string() });
+export type ModelsDbOpsSchema = z.infer<typeof modelsDbOpsSchema>;
+
+
+export const modelsTransactionsSchema = z.object({ "block_time": z.string().datetime(), "block_number": z.coerce.number(), "block_hash": z.coerce.string(), "block_date": z.string().date(), "hash": z.coerce.string(), "index": z.coerce.number(), "elapsed": z.coerce.number(), "net_usage": z.coerce.number(), "scheduled": z.boolean(), "cpu_usage_micro_seconds": z.coerce.number(), "net_usage_words": z.coerce.number(), "status": z.enum(["Executed"]), "status_code": z.coerce.number(), "success": z.boolean(), "transaction_mroot": z.coerce.string() });
 export type ModelsTransactionsSchema = z.infer<typeof modelsTransactionsSchema>;
 
 
@@ -25,10 +29,54 @@ export const versionSchema = z.object({ "version": z.coerce.string().regex(new R
 export type VersionSchema = z.infer<typeof versionSchema>;
 
 
+export const usageActionsByDatePathParamsSchema = z.object({ "block_date": z.string().date() });
+export type UsageActionsByDatePathParamsSchema = z.infer<typeof usageActionsByDatePathParamsSchema>;
+
+ export const usageActionsByDateQueryParamsSchema = z.object({ "account": z.coerce.string().optional(), "name": z.coerce.string().optional(), "receiver": z.coerce.string().optional(), "order_by": z.enum(["block_number,index", "block_number"]).default("block_number,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageActionsByDateQueryParamsSchema = z.infer<typeof usageActionsByDateQueryParamsSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageActionsByDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageActionsByDate200Schema = z.infer<typeof usageActionsByDate200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageActionsByDateErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageActionsByDateErrorSchema = z.infer<typeof usageActionsByDateErrorSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageActionsByDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageActionsByDateQueryResponseSchema = z.infer<typeof usageActionsByDateQueryResponseSchema>;
+
+
+export const usageActionsByBlockPathParamsSchema = z.object({ "block_number": z.coerce.number() });
+export type UsageActionsByBlockPathParamsSchema = z.infer<typeof usageActionsByBlockPathParamsSchema>;
+
+ export const usageActionsByBlockQueryParamsSchema = z.object({ "account": z.coerce.string().optional(), "name": z.coerce.string().optional(), "receiver": z.coerce.string().optional(), "order_by": z.enum(["block_number,index", "block_number"]).default("block_number,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageActionsByBlockQueryParamsSchema = z.infer<typeof usageActionsByBlockQueryParamsSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageActionsByBlock200Schema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageActionsByBlock200Schema = z.infer<typeof usageActionsByBlock200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageActionsByBlockErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageActionsByBlockErrorSchema = z.infer<typeof usageActionsByBlockErrorSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageActionsByBlockQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsActionsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageActionsByBlockQueryResponseSchema = z.infer<typeof usageActionsByBlockQueryResponseSchema>;
+
+
 export const usageActionsByTransactionPathParamsSchema = z.object({ "tx_hash": z.coerce.string() });
 export type UsageActionsByTransactionPathParamsSchema = z.infer<typeof usageActionsByTransactionPathParamsSchema>;
 
- export const usageActionsByTransactionQueryParamsSchema = z.object({ "order_by": z.enum(["index"]).default("index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+ export const usageActionsByTransactionQueryParamsSchema = z.object({ "account": z.coerce.string().optional(), "name": z.coerce.string().optional(), "receiver": z.coerce.string().optional(), "order_by": z.enum(["index"]).default("index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
 export type UsageActionsByTransactionQueryParamsSchema = z.infer<typeof usageActionsByTransactionQueryParamsSchema>;
 /**
  * @description The request has succeeded.
@@ -47,26 +95,70 @@ export const usageActionsByTransactionQueryResponseSchema = z.object({ "data": z
 export type UsageActionsByTransactionQueryResponseSchema = z.infer<typeof usageActionsByTransactionQueryResponseSchema>;
 
 
-export const usageAuthorizationsPathParamsSchema = z.object({ "tx_hash": z.coerce.string() });
-export type UsageAuthorizationsPathParamsSchema = z.infer<typeof usageAuthorizationsPathParamsSchema>;
+export const usageAuthorizationsByDatePathParamsSchema = z.object({ "block_date": z.string().date() });
+export type UsageAuthorizationsByDatePathParamsSchema = z.infer<typeof usageAuthorizationsByDatePathParamsSchema>;
 
- export const usageAuthorizationsQueryParamsSchema = z.object({ "action_index": z.coerce.number().optional(), "order_by": z.enum(["action_index,index", "action_index", "index"]).default("action_index,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
-export type UsageAuthorizationsQueryParamsSchema = z.infer<typeof usageAuthorizationsQueryParamsSchema>;
+ export const usageAuthorizationsByDateQueryParamsSchema = z.object({ "actor": z.coerce.string().optional(), "permission": z.coerce.string().optional(), "action_index": z.coerce.number().optional(), "order_by": z.enum(["block_number,action_index,index", "block_number", "action_index", "index"]).default("block_number,action_index,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageAuthorizationsByDateQueryParamsSchema = z.infer<typeof usageAuthorizationsByDateQueryParamsSchema>;
 /**
  * @description The request has succeeded.
  */
-export const usageAuthorizations200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
-export type UsageAuthorizations200Schema = z.infer<typeof usageAuthorizations200Schema>;
+export const usageAuthorizationsByDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageAuthorizationsByDate200Schema = z.infer<typeof usageAuthorizationsByDate200Schema>;
 /**
  * @description An unexpected error response.
  */
-export const usageAuthorizationsErrorSchema = z.lazy(() => apiErrorSchema);
-export type UsageAuthorizationsErrorSchema = z.infer<typeof usageAuthorizationsErrorSchema>;
+export const usageAuthorizationsByDateErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageAuthorizationsByDateErrorSchema = z.infer<typeof usageAuthorizationsByDateErrorSchema>;
 /**
  * @description The request has succeeded.
  */
-export const usageAuthorizationsQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
-export type UsageAuthorizationsQueryResponseSchema = z.infer<typeof usageAuthorizationsQueryResponseSchema>;
+export const usageAuthorizationsByDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageAuthorizationsByDateQueryResponseSchema = z.infer<typeof usageAuthorizationsByDateQueryResponseSchema>;
+
+
+export const usageAuthorizationsByBlockPathParamsSchema = z.object({ "block_number": z.coerce.number() });
+export type UsageAuthorizationsByBlockPathParamsSchema = z.infer<typeof usageAuthorizationsByBlockPathParamsSchema>;
+
+ export const usageAuthorizationsByBlockQueryParamsSchema = z.object({ "actor": z.coerce.string().optional(), "permission": z.coerce.string().optional(), "action_index": z.coerce.number().optional(), "order_by": z.enum(["block_number,action_index,index", "block_number", "action_index", "index"]).default("block_number,action_index,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageAuthorizationsByBlockQueryParamsSchema = z.infer<typeof usageAuthorizationsByBlockQueryParamsSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageAuthorizationsByBlock200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageAuthorizationsByBlock200Schema = z.infer<typeof usageAuthorizationsByBlock200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageAuthorizationsByBlockErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageAuthorizationsByBlockErrorSchema = z.infer<typeof usageAuthorizationsByBlockErrorSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageAuthorizationsByBlockQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageAuthorizationsByBlockQueryResponseSchema = z.infer<typeof usageAuthorizationsByBlockQueryResponseSchema>;
+
+
+export const usageAuthorizationsByTransactionPathParamsSchema = z.object({ "tx_hash": z.coerce.string() });
+export type UsageAuthorizationsByTransactionPathParamsSchema = z.infer<typeof usageAuthorizationsByTransactionPathParamsSchema>;
+
+ export const usageAuthorizationsByTransactionQueryParamsSchema = z.object({ "actor": z.coerce.string().optional(), "permission": z.coerce.string().optional(), "action_index": z.coerce.number().optional(), "order_by": z.enum(["action_index,index", "action_index", "index"]).default("action_index,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageAuthorizationsByTransactionQueryParamsSchema = z.infer<typeof usageAuthorizationsByTransactionQueryParamsSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageAuthorizationsByTransaction200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageAuthorizationsByTransaction200Schema = z.infer<typeof usageAuthorizationsByTransaction200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageAuthorizationsByTransactionErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageAuthorizationsByTransactionErrorSchema = z.infer<typeof usageAuthorizationsByTransactionErrorSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageAuthorizationsByTransactionQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageAuthorizationsByTransactionQueryResponseSchema = z.infer<typeof usageAuthorizationsByTransactionQueryResponseSchema>;
 
 
 export const usageBlocksByDatePathParamsSchema = z.object({ "date": z.string().date() });
@@ -129,26 +221,70 @@ export const usageBlocksByNumberQueryResponseSchema = z.object({ "data": z.array
 export type UsageBlocksByNumberQueryResponseSchema = z.infer<typeof usageBlocksByNumberQueryResponseSchema>;
 
 
-export const usageDbOpsPathParamsSchema = z.object({ "tx_hash": z.coerce.string() });
-export type UsageDbOpsPathParamsSchema = z.infer<typeof usageDbOpsPathParamsSchema>;
+export const usageDbOpsByDatePathParamsSchema = z.object({ "block_date": z.string().date() });
+export type UsageDbOpsByDatePathParamsSchema = z.infer<typeof usageDbOpsByDatePathParamsSchema>;
 
- export const usageDbOpsQueryParamsSchema = z.object({ "action_index": z.coerce.number().optional(), "order_by": z.enum(["index", "action_index"]).default("index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
-export type UsageDbOpsQueryParamsSchema = z.infer<typeof usageDbOpsQueryParamsSchema>;
+ export const usageDbOpsByDateQueryParamsSchema = z.object({ "code": z.coerce.string().optional(), "table_name": z.coerce.string().optional(), "scope": z.coerce.string().optional(), "primary_key": z.coerce.string().optional(), "order_by": z.enum(["block_number,index", "block_number"]).default("block_number,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageDbOpsByDateQueryParamsSchema = z.infer<typeof usageDbOpsByDateQueryParamsSchema>;
 /**
  * @description The request has succeeded.
  */
-export const usageDbOps200Schema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
-export type UsageDbOps200Schema = z.infer<typeof usageDbOps200Schema>;
+export const usageDbOpsByDate200Schema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageDbOpsByDate200Schema = z.infer<typeof usageDbOpsByDate200Schema>;
 /**
  * @description An unexpected error response.
  */
-export const usageDbOpsErrorSchema = z.lazy(() => apiErrorSchema);
-export type UsageDbOpsErrorSchema = z.infer<typeof usageDbOpsErrorSchema>;
+export const usageDbOpsByDateErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageDbOpsByDateErrorSchema = z.infer<typeof usageDbOpsByDateErrorSchema>;
 /**
  * @description The request has succeeded.
  */
-export const usageDbOpsQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsAuthorizationsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
-export type UsageDbOpsQueryResponseSchema = z.infer<typeof usageDbOpsQueryResponseSchema>;
+export const usageDbOpsByDateQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageDbOpsByDateQueryResponseSchema = z.infer<typeof usageDbOpsByDateQueryResponseSchema>;
+
+
+export const usageDbOpsByBlockPathParamsSchema = z.object({ "block_number": z.coerce.number() });
+export type UsageDbOpsByBlockPathParamsSchema = z.infer<typeof usageDbOpsByBlockPathParamsSchema>;
+
+ export const usageDbOpsByBlockQueryParamsSchema = z.object({ "code": z.coerce.string().optional(), "table_name": z.coerce.string().optional(), "scope": z.coerce.string().optional(), "primary_key": z.coerce.string().optional(), "order_by": z.enum(["index"]).default("index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageDbOpsByBlockQueryParamsSchema = z.infer<typeof usageDbOpsByBlockQueryParamsSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageDbOpsByBlock200Schema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageDbOpsByBlock200Schema = z.infer<typeof usageDbOpsByBlock200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageDbOpsByBlockErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageDbOpsByBlockErrorSchema = z.infer<typeof usageDbOpsByBlockErrorSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageDbOpsByBlockQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageDbOpsByBlockQueryResponseSchema = z.infer<typeof usageDbOpsByBlockQueryResponseSchema>;
+
+
+export const usageDbOpsByTransactionPathParamsSchema = z.object({ "tx_hash": z.coerce.string() });
+export type UsageDbOpsByTransactionPathParamsSchema = z.infer<typeof usageDbOpsByTransactionPathParamsSchema>;
+
+ export const usageDbOpsByTransactionQueryParamsSchema = z.object({ "code": z.coerce.string().optional(), "table_name": z.coerce.string().optional(), "scope": z.coerce.string().optional(), "primary_key": z.coerce.string().optional(), "order_by": z.enum(["index"]).default("index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+export type UsageDbOpsByTransactionQueryParamsSchema = z.infer<typeof usageDbOpsByTransactionQueryParamsSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageDbOpsByTransaction200Schema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageDbOpsByTransaction200Schema = z.infer<typeof usageDbOpsByTransaction200Schema>;
+/**
+ * @description An unexpected error response.
+ */
+export const usageDbOpsByTransactionErrorSchema = z.lazy(() => apiErrorSchema);
+export type UsageDbOpsByTransactionErrorSchema = z.infer<typeof usageDbOpsByTransactionErrorSchema>;
+/**
+ * @description The request has succeeded.
+ */
+export const usageDbOpsByTransactionQueryResponseSchema = z.object({ "data": z.array(z.lazy(() => modelsDbOpsSchema)), "statistics": z.object({ "elapsed": z.coerce.number(), "rows_read": z.coerce.number(), "bytes_read": z.coerce.number() }), "rows": z.coerce.number(), "rows_before_limit_at_least": z.coerce.number() });
+export type UsageDbOpsByTransactionQueryResponseSchema = z.infer<typeof usageDbOpsByTransactionQueryResponseSchema>;
 
  /**
  * @description OK or ApiError.
@@ -202,7 +338,7 @@ export type DocsOpenapiQueryResponseSchema = z.infer<typeof docsOpenapiQueryResp
 export const usageTransactionsByBlockDatePathParamsSchema = z.object({ "block_date": z.string().date() });
 export type UsageTransactionsByBlockDatePathParamsSchema = z.infer<typeof usageTransactionsByBlockDatePathParamsSchema>;
 
- export const usageTransactionsByBlockDateQueryParamsSchema = z.object({ "order_by": z.enum(["block_number,index", "block_number", "index"]).default("block_number,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
+ export const usageTransactionsByBlockDateQueryParamsSchema = z.object({ "order_by": z.enum(["block_number,index", "block_number"]).default("block_number,index").optional(), "order_direction": z.enum(["asc", "desc"]).default("asc").optional(), "first": z.coerce.number().optional(), "skip": z.coerce.number().optional() }).optional();
 export type UsageTransactionsByBlockDateQueryParamsSchema = z.infer<typeof usageTransactionsByBlockDateQueryParamsSchema>;
 /**
  * @description The request has succeeded.
@@ -277,7 +413,31 @@ export type DocsVersionErrorSchema = z.infer<typeof docsVersionErrorSchema>;
 export const docsVersionQueryResponseSchema = z.lazy(() => versionSchema);
 export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResponseSchema>;
 
- export const operations = { "Usage_actionsByTransaction": {
+ export const operations = { "Usage_actionsByDate": {
+        request: undefined,
+        parameters: {
+            path: usageActionsByDatePathParamsSchema,
+            query: usageActionsByDateQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageActionsByDateQueryResponseSchema,
+            default: usageActionsByDateQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_actionsByBlock": {
+        request: undefined,
+        parameters: {
+            path: usageActionsByBlockPathParamsSchema,
+            query: usageActionsByBlockQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageActionsByBlockQueryResponseSchema,
+            default: usageActionsByBlockQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_actionsByTransaction": {
         request: undefined,
         parameters: {
             path: usageActionsByTransactionPathParamsSchema,
@@ -289,16 +449,40 @@ export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResp
             default: usageActionsByTransactionQueryResponseSchema
         },
         errors: {}
-    }, "Usage_authorizations": {
+    }, "Usage_authorizationsByDate": {
         request: undefined,
         parameters: {
-            path: usageAuthorizationsPathParamsSchema,
-            query: usageAuthorizationsQueryParamsSchema,
+            path: usageAuthorizationsByDatePathParamsSchema,
+            query: usageAuthorizationsByDateQueryParamsSchema,
             header: undefined
         },
         responses: {
-            200: usageAuthorizationsQueryResponseSchema,
-            default: usageAuthorizationsQueryResponseSchema
+            200: usageAuthorizationsByDateQueryResponseSchema,
+            default: usageAuthorizationsByDateQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_authorizationsByBlock": {
+        request: undefined,
+        parameters: {
+            path: usageAuthorizationsByBlockPathParamsSchema,
+            query: usageAuthorizationsByBlockQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageAuthorizationsByBlockQueryResponseSchema,
+            default: usageAuthorizationsByBlockQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_authorizationsByTransaction": {
+        request: undefined,
+        parameters: {
+            path: usageAuthorizationsByTransactionPathParamsSchema,
+            query: usageAuthorizationsByTransactionQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageAuthorizationsByTransactionQueryResponseSchema,
+            default: usageAuthorizationsByTransactionQueryResponseSchema
         },
         errors: {}
     }, "Usage_blocksByDate": {
@@ -337,16 +521,40 @@ export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResp
             default: usageBlocksByNumberQueryResponseSchema
         },
         errors: {}
-    }, "Usage_db_ops": {
+    }, "Usage_dbOpsByDate": {
         request: undefined,
         parameters: {
-            path: usageDbOpsPathParamsSchema,
-            query: usageDbOpsQueryParamsSchema,
+            path: usageDbOpsByDatePathParamsSchema,
+            query: usageDbOpsByDateQueryParamsSchema,
             header: undefined
         },
         responses: {
-            200: usageDbOpsQueryResponseSchema,
-            default: usageDbOpsQueryResponseSchema
+            200: usageDbOpsByDateQueryResponseSchema,
+            default: usageDbOpsByDateQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_dbOpsByBlock": {
+        request: undefined,
+        parameters: {
+            path: usageDbOpsByBlockPathParamsSchema,
+            query: usageDbOpsByBlockQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageDbOpsByBlockQueryResponseSchema,
+            default: usageDbOpsByBlockQueryResponseSchema
+        },
+        errors: {}
+    }, "Usage_dbOpsByTransaction": {
+        request: undefined,
+        parameters: {
+            path: usageDbOpsByTransactionPathParamsSchema,
+            query: usageDbOpsByTransactionQueryParamsSchema,
+            header: undefined
+        },
+        responses: {
+            200: usageDbOpsByTransactionQueryResponseSchema,
+            default: usageDbOpsByTransactionQueryResponseSchema
         },
         errors: {}
     }, "Monitoring_health": {
@@ -434,18 +642,30 @@ export type DocsVersionQueryResponseSchema = z.infer<typeof docsVersionQueryResp
         },
         errors: {}
     } } as const;
-export const paths = { "/actions/tx_hash/{tx_hash}": {
+export const paths = { "/actions/block_date/{block_date}": {
+        get: operations["Usage_actionsByDate"]
+    }, "/actions/block_number/{block_number}": {
+        get: operations["Usage_actionsByBlock"]
+    }, "/actions/tx_hash/{tx_hash}": {
         get: operations["Usage_actionsByTransaction"]
+    }, "/authorizations/block_date/{block_date}": {
+        get: operations["Usage_authorizationsByDate"]
+    }, "/authorizations/block_number/{block_number}": {
+        get: operations["Usage_authorizationsByBlock"]
     }, "/authorizations/tx_hash/{tx_hash}": {
-        get: operations["Usage_authorizations"]
+        get: operations["Usage_authorizationsByTransaction"]
     }, "/blocks/date/{date}": {
         get: operations["Usage_blocksByDate"]
     }, "/blocks/hash/{hash}": {
         get: operations["Usage_blocksByHash"]
     }, "/blocks/number/{number}": {
         get: operations["Usage_blocksByNumber"]
+    }, "/db_ops/block_date/{block_date}": {
+        get: operations["Usage_dbOpsByDate"]
+    }, "/db_ops/block_number/{block_number}": {
+        get: operations["Usage_dbOpsByBlock"]
     }, "/db_ops/tx_hash/{tx_hash}": {
-        get: operations["Usage_db_ops"]
+        get: operations["Usage_dbOpsByTransaction"]
     }, "/health": {
         get: operations["Monitoring_health"]
     }, "/metrics": {
