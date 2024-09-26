@@ -45,7 +45,11 @@ export async function makeUsageQuery(ctx: Context, endpoint: UsageEndpoints, use
     if (query_params.offset) query.push("OFFSET {offset: int}");
 
     try {
-        return ctx.json(await makeQuery<UsageElementReturnType>(query.join(" "), { ...query_params }));
+        const result = await makeQuery<UsageElementReturnType>(query.join(" "), { ...query_params });
+        if (result.data.length === 0) {
+            return APIErrorResponse(ctx, 404, "not_found_data", `No data found for ${table_name}`);
+        }
+        return ctx.json(result);
     } catch (err) {
         return APIErrorResponse(ctx, 500, "bad_database_response", err);
     }
