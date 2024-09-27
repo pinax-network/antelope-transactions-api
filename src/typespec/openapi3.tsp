@@ -9,11 +9,7 @@ using TypeSpec.OpenAPI;
     title: "Antelope Transactions Api",
 })
 @info({
-    summary: "Transactions information from the Antelope blockchains, powered by Substreams",
-    license: {
-        name: "MIT",
-        url: "https://github.com/pinax-network/antelope-transactions-api/blob/75db1c61477ac7ea5e56f775cefe54875af953d4/LICENSE",
-    },
+    description: "Transactions information from the Antelope blockchains, powered by Substreams",
     version: "0.3.4",
 }) // From @typespec/openapi
 //@server("https://eos.api.pinax.network/v1", "EOS V1 Api Endpoint")
@@ -122,7 +118,6 @@ alias OrderByBlockActionIndex = {
         | "index" = "block_number,action_index,index";
 };
 
-@tag("Usage") // Important: all endpoints querying the ClickHouse backend must be under this tagged interface
 interface Usage {
     // ===========================================================
     // Blocks

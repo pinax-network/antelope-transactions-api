@@ -2,17 +2,10 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Antelope Transactions Api",
-    "summary": "Transactions information from the Antelope blockchains, powered by Substreams",
-    "license": {
-      "name": "MIT",
-      "url": "https://github.com/pinax-network/antelope-transactions-api/blob/75db1c61477ac7ea5e56f775cefe54875af953d4/LICENSE"
-    },
+    "description": "Transactions information from the Antelope blockchains, powered by Substreams",
     "version": "0.3.4"
   },
   "tags": [
-    {
-      "name": "Usage"
-    },
     {
       "name": "Blocks"
     },
@@ -39,7 +32,6 @@
     "/actions/block_date/{block_date}": {
       "get": {
         "tags": [
-          "Usage",
           "Actions"
         ],
         "operationId": "Usage_actionsByDate",
@@ -200,7 +192,6 @@
     "/actions/block_number/{block_number}": {
       "get": {
         "tags": [
-          "Usage",
           "Actions"
         ],
         "operationId": "Usage_actionsByBlock",
@@ -361,7 +352,6 @@
     "/actions/tx_hash/{tx_hash}": {
       "get": {
         "tags": [
-          "Usage",
           "Actions"
         ],
         "operationId": "Usage_actionsByTransaction",
@@ -520,7 +510,6 @@
     "/authorizations/block_date/{block_date}": {
       "get": {
         "tags": [
-          "Usage",
           "Authorizations"
         ],
         "operationId": "Usage_authorizationsByDate",
@@ -684,7 +673,6 @@
     "/authorizations/block_number/{block_number}": {
       "get": {
         "tags": [
-          "Usage",
           "Authorizations"
         ],
         "operationId": "Usage_authorizationsByBlock",
@@ -848,7 +836,6 @@
     "/authorizations/tx_hash/{tx_hash}": {
       "get": {
         "tags": [
-          "Usage",
           "Authorizations"
         ],
         "operationId": "Usage_authorizationsByTransaction",
@@ -1010,7 +997,6 @@
     "/blocks/date/{date}": {
       "get": {
         "tags": [
-          "Usage",
           "Blocks"
         ],
         "operationId": "Usage_blocksByDate",
@@ -1146,7 +1132,6 @@
     "/blocks/hash/{hash}": {
       "get": {
         "tags": [
-          "Usage",
           "Blocks"
         ],
         "operationId": "Usage_blocksByHash",
@@ -1236,7 +1221,6 @@
     "/blocks/number/{number}": {
       "get": {
         "tags": [
-          "Usage",
           "Blocks"
         ],
         "operationId": "Usage_blocksByNumber",
@@ -1327,7 +1311,6 @@
     "/db_ops/block_date/{block_date}": {
       "get": {
         "tags": [
-          "Usage",
           "Database Operations"
         ],
         "operationId": "Usage_dbOpsByDate",
@@ -1496,7 +1479,6 @@
     "/db_ops/block_number/{block_number}": {
       "get": {
         "tags": [
-          "Usage",
           "Database Operations"
         ],
         "operationId": "Usage_dbOpsByBlock",
@@ -1664,7 +1646,6 @@
     "/db_ops/tx_hash/{tx_hash}": {
       "get": {
         "tags": [
-          "Usage",
           "Database Operations"
         ],
         "operationId": "Usage_dbOpsByTransaction",
@@ -1931,7 +1912,6 @@
     "/transactions/block_date/{block_date}": {
       "get": {
         "tags": [
-          "Usage",
           "Transactions"
         ],
         "operationId": "Usage_transactionsByBlockDate",
@@ -2068,7 +2048,6 @@
     "/transactions/block_number/{block_number}": {
       "get": {
         "tags": [
-          "Usage",
           "Transactions"
         ],
         "operationId": "Usage_transactionsByBlockNumber",
@@ -2204,7 +2183,6 @@
     "/transactions/hash/{hash}": {
       "get": {
         "tags": [
-          "Usage",
           "Transactions"
         ],
         "operationId": "Usage_transactionsByHash",
