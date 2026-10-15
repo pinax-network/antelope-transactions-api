@@ -17,23 +17,23 @@
     }
   ],
   "dependencies": {
-    "@clickhouse/client-web": "latest",
+    "@clickhouse/client-web": "1.0.2",
     "@hono/graphql-server": "^0.5.0",
     "@kubb/cli": "^2.23.3",
     "@kubb/core": "^2.23.3",
     "@kubb/plugin-oas": "^2.23.3",
     "@kubb/swagger-zod": "^2.23.3",
-    "commander": "latest",
-    "dotenv": "latest",
-    "hono": "latest",
-    "prom-client": "latest",
-    "tslog": "latest",
-    "zod": "latest"
+    "commander": "12.1.0",
+    "dotenv": "16.4.5",
+    "hono": "4.3.9",
+    "prom-client": "15.1.2",
+    "tslog": "4.9.2",
+    "zod": "3.23.8"
   },
   "private": true,
   "scripts": {
     "build": "export APP_VERSION=$(git rev-parse --short HEAD) && bun build --compile index.ts --outfile $npm_package_name",
-    "clean": "bun i --force",
+    "clean": "rm -rf node_modules && bun install --frozen-lockfile",
     "dev": "export APP_VERSION=$(git rev-parse --short HEAD) && bun --watch index.ts",
     "lint": "export APP_VERSION=$(git rev-parse --short HEAD) && bun run tsc --noEmit --skipLibCheck --pretty",
     "start": "export APP_VERSION=$(git rev-parse --short HEAD) && bun index.ts",
@@ -45,13 +45,23 @@
   },
   "type": "module",
   "devDependencies": {
-    "@typespec/compiler": "latest",
-    "@typespec/openapi": "latest",
-    "@typespec/openapi3": "latest",
-    "bun-types": "latest",
-    "typescript": "latest"
+    "@typespec/compiler": "0.55.0",
+    "@typespec/openapi": "0.56.0",
+    "@typespec/openapi3": "0.56.0",
+    "bun-types": "1.1.9",
+    "typescript": "5.4.5"
   },
   "prettier": {
     "tabWidth": 4
+  },
+  "packageManager": "bun@1.4.3",
+  "engines": {
+    "bun": ">=1.4.3"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "onFail": "error"
+    }
   }
 }
