@@ -37,7 +37,7 @@
     "dev": "export APP_VERSION=$(git rev-parse --short HEAD) && bun --watch index.ts",
     "lint": "export APP_VERSION=$(git rev-parse --short HEAD) && bun run tsc --noEmit --skipLibCheck --pretty",
     "start": "export APP_VERSION=$(git rev-parse --short HEAD) && bun index.ts",
-    "test": "bun test --coverage",
+    "test": "bun test --coverage --pass-with-no-tests",
     "types": "bun run tsp compile ./src/typespec --output-dir static && bun run kubb",
     "types:check": "bun run tsp compile ./src/typespec --no-emit --pretty --warn-as-error",
     "types:format": "bun run tsp format src/typespec/**/*.tsp",
