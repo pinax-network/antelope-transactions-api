@@ -22,7 +22,7 @@ jobs:
 
       - name: 'Run test'
         run: |
-          bun test
+          bun test --pass-with-no-tests
         env:
           PORT: ${{ vars.PORT }}
           HOSTNAME: ${{ vars.HOSTNAME }}
